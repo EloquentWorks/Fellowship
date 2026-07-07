@@ -18,12 +18,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     use CanResetPassword;
     use HasFriendships;
 
-    /** @var string $table The database table used by the model. */
+    /** @var string The database table used by the model. */
     protected $table = 'users';
 
-    /** @var array $fillable The attributes that are mass assignable. */
+    /** @var array The attributes that are mass assignable. */
     protected $fillable = ['name', 'email', 'password'];
 
-    /** @var array $hidden The attributes excluded from the model's JSON form. */
+    /** @var array The attributes excluded from the model's JSON form. */
     protected $hidden = ['password', 'remember_token'];
 }

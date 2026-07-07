@@ -8,15 +8,15 @@ use EloquentWorks\Fellowship\Status;
 use Illuminate\Console\Command;
 
 /**
- * Command to expire pending friend requests that are past their expiration date.
+ * Command to expire pending fellowship requests that are past their expiration date.
  */
-class ExpireFriendRequestsCommand extends Command
+class ExpireFellowshipRequestsCommand extends Command
 {
     /** @var string The name and signature of the console command. */
-    protected $signature = 'friendships:expire {--chunk=100 : The number of records to process per chunk}';
+    protected $signature = 'fellowships:expire {--chunk=100 : The number of records to process per chunk}';
 
     /** @var string The console command description. */
-    protected $description = 'Expire pending friend requests that are past their expiration date.';
+    protected $description = 'Expire pending fellowship requests that are past their expiration date.';
 
     /**
      * Handle the command execution.

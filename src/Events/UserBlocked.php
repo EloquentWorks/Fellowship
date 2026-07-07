@@ -1,8 +1,8 @@
 <?php
 
-namespace PixelError\Friendships\Events;
+namespace EloquentWorks\Fellowship\Events;
 
-use PixelError\Friendships\Models\Friendship;
+use EloquentWorks\Fellowship\Models\Fellowship;
 
 /**
  * Event fired when a user is blocked.
@@ -12,11 +12,11 @@ class UserBlocked
     /**
      * Create a new event instance.
      *
-     * @param  Friendship  $friendship  The friendship model related to the event.
+     * @param  Fellowship  $fellowship  The fellowship model related to the event.
      * @return void Returns nothing.
      */
     public function __construct(
-        public Friendship $friendship
+        public Fellowship $fellowship
     ) {
         //
     }

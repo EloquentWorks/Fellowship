@@ -3,7 +3,7 @@
 namespace EloquentWorks\Fellowship;
 
 use EloquentWorks\Fellowship\Console\Commands\ExpireFriendRequestsCommand;
-use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
+// use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
 use Illuminate\Support\ServiceProvider;
 
 class FellowshipServiceProvider extends ServiceProvider
@@ -18,10 +18,11 @@ class FellowshipServiceProvider extends ServiceProvider
         // Ensure we are running in the console before publishing migrations and configuration files.
         if ($this->app->runningInConsole()) {
 
-            // Register the console command for expiring friend requests.
+            // Register the console command for expiring fellowship requests.
+            // Register the console command for installing the fellowship package.
             $this->commands([
-                ExpireFriendRequestsCommand::class,
-                InstallFellowshipCommand::class,
+                ExpireFellowshipRequestsCommand::class,
+                // InstallFellowshipCommand::class,
             ]);
 
             // Publish the package migrations to the application's migrations directory.

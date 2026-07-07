@@ -39,6 +39,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Route Defaults
+    |--------------------------------------------------------------------------
+    |
+    | Fellowship does not load web routes automatically. Register them inside
+    | your application's routes/web.php file with: Fellowship::routes();
+    |
+    | You may publish a copyable route snippet with:
+    | php artisan vendor:publish --tag=fellowship-routes
+    |
+    */
+
+    'routes' => [
+        'prefix' => 'fellowship',
+        'middleware' => ['web', 'auth'],
+        'name' => 'fellowship.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Friend Request Expiration
     |--------------------------------------------------------------------------
     |

@@ -5,7 +5,7 @@
          colors="true"
          cacheDirectory=".phpunit.cache">
     <testsuites>
-        <testsuite name="PixelError Friendships Test Suite">
+        <testsuite name="PixelError Fellowship Test Suite">
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
@@ -18,7 +18,7 @@
             <directory suffix=".php">./src/config</directory>
             <directory suffix=".php">./src/database/migrations</directory>
             <file>./src/Status.php</file>
-            <file>./src/FriendshipsServiceProvider.php</file>
+            <file>./src/FellowshipServiceProvider.php</file>
         </exclude>
     </source>
 </phpunit>

@@ -3,11 +3,9 @@
     "description": "Fellowship provides elegant friendship and social connection tools for Laravel applications, including friend requests, blocks, mutual friends, and relationship management.",
     "keywords": [
         "laravel",
-        "friendships",
-        "friend-system",
-        "friends",
-        "social",
+        "fellowship-system",
         "fellowship",
+        "social",
         "eloquent"
     ],
     "license": "MIT",
@@ -22,7 +20,8 @@
         "illuminate/database": "^12.0 || ^13.0",
         "illuminate/events": "^12.0 || ^13.0",
         "illuminate/pagination": "^12.0 || ^13.0",
-        "illuminate/support": "^12.0 || ^13.0"
+        "illuminate/support": "^12.0 || ^13.0",
+        "illuminate/routing": "^12.0 || ^13.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.6",
@@ -34,7 +33,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PixelError\\Friendships\\": "src/"
+            "EloquentWorks\\Fellowship\\": "src/"
         }
     },
     "autoload-dev": {
@@ -51,8 +50,11 @@
     "extra": {
         "laravel": {
             "providers": [
-                "EloquentWorks\\Fellowship\\FriendshipsServiceProvider"
-            ]
+                "EloquentWorks\\Fellowship\\FellowshipServiceProvider"
+            ],
+            "aliases": {
+                "Fellowship": "EloquentWorks\\Fellowship\\Facades\\Fellowship"
+            }
         }
     },
     "minimum-stability": "stable",

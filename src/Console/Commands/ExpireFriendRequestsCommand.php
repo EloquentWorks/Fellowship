@@ -2,7 +2,7 @@
 
 namespace EloquentWorks\Fellowship\Console\Commands;
 
-use EloquentWorks\Fellowship\Events\FriendRequestExpired;
+use EloquentWorks\Fellowship\Events\FellowshipRequestExpired;
 use EloquentWorks\Fellowship\Models\Fellowship;
 use EloquentWorks\Fellowship\Status;
 use Illuminate\Console\Command;
@@ -27,13 +27,13 @@ class ExpireFellowshipRequestsCommand extends Command
     {
         $count = 0;
 
-        $friendshipModel = config('friendships.models.friendship', Fellowship::class);
+        $fellowshipModel = config('fellowships.models.fellowship', Fellowship::class);
 
         // Get the chunk size from the command option.
         $chunkSize = max(1, (int) $this->option('chunk'));
 
-        // Process expired pending friend requests in chunks to avoid memory issues.
-        $friendshipModel::query()
+        // Process expired pending fellowship requests in chunks to avoid memory issues.
+        $fellowshipModel::query()
             ->where('status', Status::PENDING)
             ->whereNotNull('expires_at')
             ->where('expires_at', '<=', now())
@@ -48,14 +48,14 @@ class ExpireFellowshipRequestsCommand extends Command
 
                     $count++;
 
-                    if (config('friendships.dispatch_events', true)) {
-                        event(new FriendRequestExpired($fellowship));
+                    if (config('fellowships.dispatch_events', true)) {
+                        event(new FellowshipRequestExpired($fellowship));
                     }
                 }
             });
 
-        // Output the number of expired friend requests to the console.
-        $this->info("Expired {$count} friend request(s).");
+        // Output the number of expired fellowship requests to the console.
+        $this->info("Expired {$count} fellowship request(s).");
 
         // Return a success exit code.
         return self::SUCCESS;

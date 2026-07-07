@@ -4,8 +4,6 @@ namespace Tests\Unit;
 
 use EloquentWorks\Fellowship\Facades\Fellowship as FellowshipFacade;
 use EloquentWorks\Fellowship\Fellowship;
-use EloquentWorks\Fellowship\FellowshipServiceProvider;
-use EloquentWorks\Fellowship\FriendshipsServiceProvider;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

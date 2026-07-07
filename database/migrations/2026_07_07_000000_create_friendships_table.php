@@ -16,6 +16,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Retrieve the users table name from the configuration.
+        $usersTable = config('fellowship.tables.users');
+
         // Create the friendships table with the specified schema.
         Schema::create(config('fellowship.tables.friendships', 'friendships'), function (Blueprint $table) use ($usersTable): void {
             // Auto-incrementing primary key for the friendships table.

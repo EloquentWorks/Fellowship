@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -17,7 +16,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Get the users table name from the configuration, defaulting to 'users'.
+        // Create the friendships table with the specified schema.
         Schema::create(config('friendships.tables.friendships', 'friendships'), function (Blueprint $table) use ($usersTable): void {
             // Auto-incrementing primary key for the friendships table.
             $table->id();

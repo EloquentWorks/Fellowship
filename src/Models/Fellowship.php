@@ -33,7 +33,7 @@ class Fellowship extends Model
      */
     public function getTable(): string
     {
-        return config('fellowship.tables.fellowships', 'fellowships');
+        return config('fellowship.tables.friendships', 'friendships');
     }
 
     /**

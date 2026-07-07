@@ -17,7 +17,7 @@ return new class extends Migration
     public function up(): void
     {
         // Create the friendships table with the specified schema.
-        Schema::create(config('friendships.tables.friendships', 'friendships'), function (Blueprint $table) use ($usersTable): void {
+        Schema::create(config('fellowship.tables.friendships', 'friendships'), function (Blueprint $table) use ($usersTable): void {
             // Auto-incrementing primary key for the friendships table.
             $table->id();
 
@@ -84,6 +84,6 @@ return new class extends Migration
     public function down(): void
     {
         // Drop the friendships table if it exists.
-        Schema::dropIfExists(config('friendships.tables.friendships', 'friendships'));
+        Schema::dropIfExists(config('fellowship.tables.friendships', 'friendships'));
     }
 };

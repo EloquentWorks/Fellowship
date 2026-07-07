@@ -2,10 +2,10 @@
 
 namespace Tests;
 
+use EloquentWorks\Fellowship\Models\Friendship;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PHPUnit\Framework\Attributes\Test;
-use EloquentWorks\Fellowship\Models\Friendship;
 
 class ReturnTypesTest extends TestCase
 {

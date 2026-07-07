@@ -2,9 +2,9 @@
 
 namespace EloquentWorks\Fellowship;
 
-use Illuminate\Support\ServiceProvider;
 use EloquentWorks\Fellowship\Console\Commands\ExpireFriendRequestsCommand;
 use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
+use Illuminate\Support\ServiceProvider;
 
 class FellowshipServiceProvider extends ServiceProvider
 {

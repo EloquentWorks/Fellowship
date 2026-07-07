@@ -2,10 +2,10 @@
 
 namespace EloquentWorks\Fellowship\Console\Commands;
 
-use Illuminate\Console\Command;
 use EloquentWorks\Fellowship\Events\FriendRequestExpired;
 use EloquentWorks\Fellowship\Models\Friendship;
 use EloquentWorks\Fellowship\Status;
+use Illuminate\Console\Command;
 
 /**
  * Command to expire pending friend requests that are past their expiration date.

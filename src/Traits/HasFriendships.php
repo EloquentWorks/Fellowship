@@ -2,13 +2,6 @@
 
 namespace EloquentWorks\Fellowship\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use LogicException;
 use EloquentWorks\Fellowship\Events\FriendRequestAccepted;
 use EloquentWorks\Fellowship\Events\FriendRequestCanceled;
 use EloquentWorks\Fellowship\Events\FriendRequestDenied;
@@ -19,6 +12,13 @@ use EloquentWorks\Fellowship\Events\UserBlocked;
 use EloquentWorks\Fellowship\Events\UserUnblocked;
 use EloquentWorks\Fellowship\Models\Friendship;
 use EloquentWorks\Fellowship\Status;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use LogicException;
 
 /**
  * Trait HasFriendships

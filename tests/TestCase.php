@@ -2,10 +2,10 @@
 
 namespace Tests;
 
+use EloquentWorks\Fellowship\FriendshipsServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use EloquentWorks\Fellowship\FriendshipsServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {

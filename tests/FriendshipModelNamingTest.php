@@ -2,9 +2,9 @@
 
 namespace Tests;
 
-use PHPUnit\Framework\Attributes\Test;
 use EloquentWorks\Fellowship\Models\FriendFriendshipGroups;
 use EloquentWorks\Fellowship\Models\FriendshipGroup;
+use PHPUnit\Framework\Attributes\Test;
 
 class FriendshipModelNamingTest extends TestCase
 {

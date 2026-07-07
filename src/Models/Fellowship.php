@@ -1,14 +1,14 @@
 <?php
 
-namespace PixelError\Friendships\Models;
+namespace EloquentWorks\Fellowship\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Represents a friendship relationship between two models.
+ * Represents a Fellowship relationship between two models.
  */
-class Friendship extends Model
+class Fellowship extends Model
 {
     /** @var list<string> The attributes that are mass assignable. */
     protected $fillable = [
@@ -27,17 +27,17 @@ class Friendship extends Model
     ];
 
     /**
-     * Get the table name for the friendship model.
+     * Get the table name for the fellowship model.
      *
      * @return string Returns the table name.
      */
     public function getTable(): string
     {
-        return config('friendships.tables.friendships', 'friendships');
+        return config('fellowship.tables.fellowships', 'fellowships');
     }
 
     /**
-     * Get the model that sent the friendship request.
+     * Get the model that sent the fellowship request.
      *
      * @return BelongsTo Returns the sender relationship.
      */
@@ -47,7 +47,7 @@ class Friendship extends Model
     }
 
     /**
-     * Get the user who received the friend request.
+     * Get the model that received the fellowship request.
      *
      * @return BelongsTo Returns the recipient relationship.
      */

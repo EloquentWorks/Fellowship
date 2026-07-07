@@ -1,25 +1,20 @@
 <?php
 
-use App\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Tests\Support\User;
 
-/**
- * Create one or more test users.
- *
- * @return Illuminate\Database\Eloquent\Collection|User[]|User
- */
-function createUser(array $overrides = [], int $amount = 1)
+function createUser(array $attributes = [], int $count = 1): User|Collection
 {
-    $users = Collection::times($amount, function () use ($overrides) {
-        $unique = (string) Str::uuid();
+    $users = Collection::times($count, function () use ($attributes): User {
+        $uuid = (string) Str::uuid();
 
         return User::query()->create(array_merge([
             'name' => 'Test User',
-            'email' => "user-{$unique}@example.test",
+            'email' => "user-{$uuid}@example.test",
             'password' => bcrypt('password'),
-        ], $overrides));
+        ], $attributes));
     });
 
-    return $amount === 1 ? $users->first() : $users;
+    return $count === 1 ? $users->first() : $users;
 }

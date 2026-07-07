@@ -2,17 +2,26 @@
 
 namespace Tests;
 
-use EloquentWorks\Fellowship\FriendshipsServiceProvider;
+use EloquentWorks\Fellowship\FellowshipServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Tests\Support\User;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends OrchestraTestCase
 {
     protected function getPackageProviders($app): array
     {
         return [
-            FriendshipsServiceProvider::class,
+            FellowshipServiceProvider::class,
+        ];
+    }
+
+    protected function getPackageAliases($app): array
+    {
+        return [
+            'Fellowship' => \EloquentWorks\Fellowship\Facades\Fellowship::class,
         ];
     }
 
@@ -23,15 +32,24 @@ abstract class TestCase extends BaseTestCase
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
+            'foreign_key_constraints' => true,
         ]);
 
-        $app['config']->set('friendships.tables.fr_pivot', 'friendships');
-        $app['config']->set('friendships.tables.fr_groups_pivot', 'user_friendship_groups');
-        $app['config']->set('friendships.groups', [
-            'acquaintances' => 0,
-            'close_friends' => 1,
-            'family' => 2,
+        $app['config']->set('auth.defaults.guard', 'web');
+        $app['config']->set('auth.guards.web', [
+            'driver' => 'session',
+            'provider' => 'users',
         ]);
+        $app['config']->set('auth.providers.users', [
+            'driver' => 'eloquent',
+            'model' => User::class,
+        ]);
+
+        $app['config']->set('fellowship.tables.users', 'users');
+        $app['config']->set('fellowship.tables.friendships', 'friendships');
+        $app['config']->set('fellowship.expires_after_days', 30);
+        $app['config']->set('fellowship.request_cooldown_days', 7);
+        $app['config']->set('fellowship.dispatch_events', true);
     }
 
     protected function setUp(): void
@@ -39,45 +57,25 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->setUpDatabase();
+
+        Route::get('/login', fn (): string => 'login')->name('login');
     }
 
     protected function setUpDatabase(): void
     {
-        Schema::dropIfExists('user_friendship_groups');
         Schema::dropIfExists('friendships');
         Schema::dropIfExists('users');
 
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
 
-        Schema::create('friendships', function (Blueprint $table) {
-            $table->id();
-            $table->morphs('sender');
-            $table->morphs('recipient');
-            $table->tinyInteger('status')->default(0);
-            $table->timestamps();
-        });
-
-        Schema::create('user_friendship_groups', function (Blueprint $table) {
-            $table->unsignedBigInteger('friendship_id');
-            $table->morphs('friend');
-            $table->unsignedInteger('group_id');
-
-            $table->foreign('friendship_id')
-                ->references('id')
-                ->on('friendships')
-                ->cascadeOnDelete();
-
-            $table->unique(
-                ['friendship_id', 'friend_id', 'friend_type', 'group_id'],
-                'friendship_group_unique'
-            );
-        });
+        $migration = require __DIR__.'/../database/migrations/2026_07_07_000000_create_friendships_table.php';
+        $migration->up();
     }
 }

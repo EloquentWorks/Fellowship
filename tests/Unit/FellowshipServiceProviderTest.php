@@ -33,13 +33,4 @@ class FellowshipServiceProviderTest extends TestCase
     {
         $this->assertNull(Route::getRoutes()->getByName('fellowship.requests.store'));
     }
-
-    #[Test]
-    public function backwards_compatible_provider_alias_extends_the_main_provider(): void
-    {
-        $this->assertTrue(is_subclass_of(
-            FriendshipsServiceProvider::class,
-            FellowshipServiceProvider::class,
-        ));
-    }
 }

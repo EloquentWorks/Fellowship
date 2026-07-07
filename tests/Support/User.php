@@ -2,12 +2,12 @@
 
 namespace Tests\Support;
 
-use EloquentWorks\Fellowship\Traits\HasFriendships;
+use EloquentWorks\Fellowship\Traits\HasFellowships;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFriendships;
+    use HasFellowships;
 
     protected $table = 'users';
 

@@ -21,11 +21,11 @@ use Illuminate\Support\Facades\DB;
 use LogicException;
 
 /**
- * Trait HasFriendships
+ * Trait HasFellowships
  *
  * Provides friendship functionality to Eloquent models.
  */
-trait HasFriendships
+trait HasFellowships
 {
     /**
      * Get friend requests sent by this user.

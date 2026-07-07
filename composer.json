@@ -40,9 +40,6 @@
         "files": [
             "tests/helpers.php"
         ],
-        "classmap": [
-            "tests/Stub_User.php"
-        ],
         "psr-4": {
             "Tests\\": "tests/"
         }

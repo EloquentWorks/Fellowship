@@ -46,8 +46,8 @@ use Hootlex\Friendships\Status;
 New applications should use:
 
 ```php
-use PixelError\Friendships\Traits\Friendable;
-use PixelError\Friendships\Status;
+use EloquentWorks\Fellowship\Traits\Friendable;
+use EloquentWorks\Fellowship\Status;
 ```
 
 This release keeps the old namespace working through Composer-loaded aliases.
@@ -114,7 +114,7 @@ If you publish config or migrations, compare your existing files before overwrit
 Before production use, test:
 
 - Legacy `Hootlex\Friendships` imports
-- New `PixelError\Friendships` imports
+- New `EloquentWorks\Fellowship` imports
 - Friend requests
 - Friend acceptance
 - Friend denial

@@ -1,11 +1,11 @@
 <?php
 
-namespace PixelError\Friendships\Console\Commands;
+namespace EloquentWorks\Fellowship\Console\Commands;
 
 use Illuminate\Console\Command;
-use PixelError\Friendships\Events\FriendRequestExpired;
-use PixelError\Friendships\Models\Friendship;
-use PixelError\Friendships\Status;
+use EloquentWorks\Fellowship\Events\FriendRequestExpired;
+use EloquentWorks\Fellowship\Models\Friendship;
+use EloquentWorks\Fellowship\Status;
 
 /**
  * Command to expire pending friend requests that are past their expiration date.

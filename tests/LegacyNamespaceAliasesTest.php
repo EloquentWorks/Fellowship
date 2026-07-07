@@ -4,7 +4,7 @@ namespace Tests;
 
 use Hootlex\Friendships\Status;
 use PHPUnit\Framework\Attributes\Test;
-use PixelError\Friendships\Status as PixelErrorStatus;
+use EloquentWorks\Fellowship\Status as PixelErrorStatus;
 
 class LegacyNamespaceAliasesTest extends TestCase
 {

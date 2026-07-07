@@ -5,7 +5,7 @@ namespace Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use PixelError\Friendships\FriendshipsServiceProvider;
+use EloquentWorks\Fellowship\FriendshipsServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {

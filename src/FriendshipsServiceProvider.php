@@ -1,9 +1,10 @@
 <?php
 
-namespace PixelError\Friendships;
+namespace EloquentWorks\Fellowship;
 
 use Illuminate\Support\ServiceProvider;
-use PixelError\Friendships\Console\Commands\ExpireFriendRequestsCommand;
+use EloquentWorks\Fellowship\Console\Commands\ExpireFriendRequestsCommand;
+use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
 
 class FriendshipsServiceProvider extends ServiceProvider
 {

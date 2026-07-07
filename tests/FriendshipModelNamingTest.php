@@ -3,8 +3,8 @@
 namespace Tests;
 
 use PHPUnit\Framework\Attributes\Test;
-use PixelError\Friendships\Models\FriendFriendshipGroups;
-use PixelError\Friendships\Models\FriendshipGroup;
+use EloquentWorks\Fellowship\Models\FriendFriendshipGroups;
+use EloquentWorks\Fellowship\Models\FriendshipGroup;
 
 class FriendshipModelNamingTest extends TestCase
 {

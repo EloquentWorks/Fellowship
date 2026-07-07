@@ -120,7 +120,7 @@ Laravel should automatically discover the package service provider.
 Publish the package configuration file:
 
 ```bash
-php artisan vendor:publish --provider="PixelError\Friendships\FriendshipsServiceProvider" --tag="friendships-config"
+php artisan vendor:publish --provider="EloquentWorks\Fellowship\FriendshipsServiceProvider" --tag="friendships-config"
 ```
 
 This will create the config file at:
@@ -190,7 +190,7 @@ return [
 Publish the package migrations:
 
 ```bash
-php artisan vendor:publish --provider="PixelError\Friendships\FriendshipsServiceProvider" --tag="friendships-migrations"
+php artisan vendor:publish --provider="EloquentWorks\Fellowship\FriendshipsServiceProvider" --tag="friendships-migrations"
 ```
 
 Then run the migrations:
@@ -215,7 +215,7 @@ Most applications will add it to the `User` model.
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use PixelError\Friendships\Traits\Friendable;
+use EloquentWorks\Fellowship\Traits\Friendable;
 
 class User extends Authenticatable
 {

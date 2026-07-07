@@ -1,6 +1,6 @@
 <?php
 
-namespace PixelError\Friendships;
+namespace EloquentWorks\Fellowship;
 
 /**
  * Class Status

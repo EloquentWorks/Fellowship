@@ -1,6 +1,6 @@
 <?php
 
-namespace PixelError\Friendships\Traits;
+namespace EloquentWorks\Fellowship\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -9,16 +9,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use LogicException;
-use PixelError\Friendships\Events\FriendRequestAccepted;
-use PixelError\Friendships\Events\FriendRequestCanceled;
-use PixelError\Friendships\Events\FriendRequestDenied;
-use PixelError\Friendships\Events\FriendRequestExpired;
-use PixelError\Friendships\Events\FriendRequestSent;
-use PixelError\Friendships\Events\FriendshipRemoved;
-use PixelError\Friendships\Events\UserBlocked;
-use PixelError\Friendships\Events\UserUnblocked;
-use PixelError\Friendships\Models\Friendship;
-use PixelError\Friendships\Status;
+use EloquentWorks\Fellowship\Events\FriendRequestAccepted;
+use EloquentWorks\Fellowship\Events\FriendRequestCanceled;
+use EloquentWorks\Fellowship\Events\FriendRequestDenied;
+use EloquentWorks\Fellowship\Events\FriendRequestExpired;
+use EloquentWorks\Fellowship\Events\FriendRequestSent;
+use EloquentWorks\Fellowship\Events\FriendshipRemoved;
+use EloquentWorks\Fellowship\Events\UserBlocked;
+use EloquentWorks\Fellowship\Events\UserUnblocked;
+use EloquentWorks\Fellowship\Models\Friendship;
+use EloquentWorks\Fellowship\Status;
 
 /**
  * Trait HasFriendships

@@ -1,6 +1,6 @@
 <?php
 
-use PixelError\Friendships\Models\Friendship;
+use EloquentWorks\Fellowship\Models\Friendship;
 
 return [
 

@@ -2,6 +2,6 @@
 
 return [
     'providers' => append_config([
-        'PixelError\Friendships\FriendshipsServiceProvider',
+        'EloquentWorks\Fellowship\FriendshipsServiceProvider',
     ]),
 ];

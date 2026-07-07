@@ -1,11 +1,13 @@
 {
-    "name": "user-pixel-error/laravel-friendships",
-    "description": "This package gives Eloquent models the ability to manage their friendships.",
+    "name": "eloquent-works/fellowship",
+    "description": "Fellowship provides elegant friendship and social connection tools for Laravel applications, including friend requests, blocks, mutual friends, and relationship management.",
     "keywords": [
         "laravel",
         "friendships",
         "friend-system",
         "friends",
+        "social",
+        "fellowship",
         "eloquent"
     ],
     "license": "MIT",
@@ -49,7 +51,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "PixelError\\Friendships\\FriendshipsServiceProvider"
+                "EloquentWorks\\Fellowship\\FriendshipsServiceProvider"
             ]
         }
     },

@@ -4,21 +4,15 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          cacheDirectory=".phpunit.cache">
-    <testsuites>
-        <testsuite name="PixelError Fellowship Test Suite">
-            <directory suffix="Test.php">./tests</directory>
-        </testsuite>
-    </testsuites>
+	<testsuites>
+		<testsuite name="Fellowship Test Suite">
+			<directory suffix="Test.php">./tests</directory>
+		</testsuite>
+	</testsuites>
 
-    <source>
-        <include>
-            <directory suffix=".php">./src</directory>
-        </include>
-        <exclude>
-            <directory suffix=".php">./src/config</directory>
-            <directory suffix=".php">./src/database/migrations</directory>
-            <file>./src/Status.php</file>
-            <file>./src/FellowshipServiceProvider.php</file>
-        </exclude>
-    </source>
+	<source>
+		<include>
+			<directory suffix=".php">./src</directory>
+		</include>
+	</source>
 </phpunit>

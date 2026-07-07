@@ -2,12 +2,12 @@
 
 namespace EloquentWorks\Fellowship\Traits;
 
+use EloquentWorks\Fellowship\Events\FellowshipRemoved;
 use EloquentWorks\Fellowship\Events\FellowshipRequestAccepted;
 use EloquentWorks\Fellowship\Events\FellowshipRequestCanceled;
 use EloquentWorks\Fellowship\Events\FellowshipRequestDenied;
 use EloquentWorks\Fellowship\Events\FellowshipRequestExpired;
 use EloquentWorks\Fellowship\Events\FellowshipRequestSent;
-use EloquentWorks\Fellowship\Events\FellowshipRemoved;
 use EloquentWorks\Fellowship\Events\UserBlocked;
 use EloquentWorks\Fellowship\Events\UserUnblocked;
 use EloquentWorks\Fellowship\Models\Fellowship;

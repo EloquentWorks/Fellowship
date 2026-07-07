@@ -2,7 +2,6 @@
 
 namespace EloquentWorks\Fellowship;
 
-use EloquentWorks\Fellowship\Console\Commands\ExpireFriendRequestsCommand;
 // use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
 use Illuminate\Support\ServiceProvider;
 

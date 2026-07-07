@@ -1,12 +1,12 @@
 <?php
 
-use EloquentWorks\Fellowship\Models\Friendship;
+use EloquentWorks\Fellowship\Models\Fellowship;
 
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | Friendship Models
+    | Fellowship Models
     |--------------------------------------------------------------------------
     |
     | These are the model classes used by the package.
@@ -17,7 +17,7 @@ return [
     */
 
     'models' => [
-        'friendship' => Friendship::class,
+        'fellowship' => Fellowship::class,
     ],
 
     /*
@@ -31,10 +31,10 @@ return [
     | If you do change them, make sure your migrations use the same names.
     |
     */
+
     'tables' => [
         'users' => 'users',
-        'fr_pivot' => 'friendships',
-        'friendships' => 'user_friendships',
+        'friendships' => 'friendships',
     ],
 
     /*

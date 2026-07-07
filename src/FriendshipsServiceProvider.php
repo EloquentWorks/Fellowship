@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use EloquentWorks\Fellowship\Console\Commands\ExpireFriendRequestsCommand;
 use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
 
-class FriendshipsServiceProvider extends ServiceProvider
+class FellowshipServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any package services.
@@ -21,17 +21,18 @@ class FriendshipsServiceProvider extends ServiceProvider
             // Register the console command for expiring friend requests.
             $this->commands([
                 ExpireFriendRequestsCommand::class,
+                InstallFellowshipCommand::class,
             ]);
 
             // Publish the package migrations to the application's migrations directory.
             $this->publishesMigrations([
                 __DIR__.'/../database/migrations/' => database_path('migrations'),
-            ], 'friendships-migrations');
+            ], 'fellowship-migrations');
 
             // Publish the package configuration file to the application's config directory.
             $this->publishes([
-                __DIR__.'/../config/friendships.php' => config_path('friendships.php'),
-            ], 'friendships-config');
+                __DIR__.'/../config/fellowship.php' => config_path('fellowship.php'),
+            ], 'fellowship-config');
         }
         // Load the package routes from the specified file.
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
@@ -45,6 +46,6 @@ class FriendshipsServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Merge the package configuration with the application's configuration.
-        $this->mergeConfigFrom(__DIR__.'/../config/friendships.php', 'friendships');
+        $this->mergeConfigFrom(__DIR__.'/../config/fellowship.php', 'fellowship');
     }
 }

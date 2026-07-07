@@ -2,15 +2,15 @@
 
 namespace EloquentWorks\Fellowship\Traits;
 
-use EloquentWorks\Fellowship\Events\FriendRequestAccepted;
-use EloquentWorks\Fellowship\Events\FriendRequestCanceled;
-use EloquentWorks\Fellowship\Events\FriendRequestDenied;
-use EloquentWorks\Fellowship\Events\FriendRequestExpired;
-use EloquentWorks\Fellowship\Events\FriendRequestSent;
-use EloquentWorks\Fellowship\Events\FriendshipRemoved;
+use EloquentWorks\Fellowship\Events\FellowshipRequestAccepted;
+use EloquentWorks\Fellowship\Events\FellowshipRequestCanceled;
+use EloquentWorks\Fellowship\Events\FellowshipRequestDenied;
+use EloquentWorks\Fellowship\Events\FellowshipRequestExpired;
+use EloquentWorks\Fellowship\Events\FellowshipRequestSent;
+use EloquentWorks\Fellowship\Events\FellowshipRemoved;
 use EloquentWorks\Fellowship\Events\UserBlocked;
 use EloquentWorks\Fellowship\Events\UserUnblocked;
-use EloquentWorks\Fellowship\Models\Friendship;
+use EloquentWorks\Fellowship\Models\Fellowship;
 use EloquentWorks\Fellowship\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -35,7 +35,7 @@ trait HasFellowships
     public function sentFriendships(): HasMany
     {
         return $this->hasMany(
-            config('friendships.models.friendship', Friendship::class),
+            config('fellowship.models.fellowship', Fellowship::class),
             'sender_id'
         );
     }
@@ -48,7 +48,7 @@ trait HasFellowships
     public function receivedFriendships(): HasMany
     {
         return $this->hasMany(
-            config('friendships.models.friendship', Friendship::class),
+            config('fellowship.models.fellowship', Fellowship::class),
             'recipient_id'
         );
     }
@@ -82,14 +82,14 @@ trait HasFellowships
      * Send a friend request to another user.
      *
      * @param  Model  $user  The user to whom the friend request is being sent.
-     * @return Friendship Returns the created or updated friendship model.
+     * @return Fellowship Returns the created or updated friendship model.
      */
-    public function sendFriendRequestTo(Model $user): Friendship
+    public function sendFriendRequestTo(Model $user): Fellowship
     {
         $this->guardAgainstSelfFriendship($user);
 
         // Use a database transaction to ensure atomicity of the friend request operation.
-        return DB::transaction(function () use ($user): Friendship {
+        return DB::transaction(function () use ($user): Fellowship {
             $pairKey = $this->friendshipPairKey($user);
 
             // Check if there is an existing friendship between the two users.
@@ -125,7 +125,7 @@ trait HasFellowships
                     'expires_at' => $this->friendRequestExpiresAt(),
                 ])->save();
 
-                $this->dispatchFriendshipEvent(new FriendRequestSent($existingFriendship));
+                $this->dispatchFriendshipEvent(new FellowshipRequestSent($existingFriendship));
 
                 // Return the updated friendship model with 'pending' status.
                 return $existingFriendship;
@@ -139,7 +139,7 @@ trait HasFellowships
                 'expires_at' => $this->friendRequestExpiresAt(),
             ]);
 
-            $this->dispatchFriendshipEvent(new FriendRequestSent($friendship));
+            $this->dispatchFriendshipEvent(new FellowshipRequestSent($friendship));
 
             return $friendship;
         });
@@ -175,7 +175,7 @@ trait HasFellowships
                     'accepted_at' => null,
                 ])->save();
 
-                $this->dispatchFriendshipEvent(new FriendRequestExpired($friendship));
+                $this->dispatchFriendshipEvent(new FellowshipRequestExpired($friendship));
 
                 return false;
             }
@@ -188,7 +188,7 @@ trait HasFellowships
             ])->save();
 
             if ($saved) {
-                $this->dispatchFriendshipEvent(new FriendRequestAccepted($friendship));
+                $this->dispatchFriendshipEvent(new FellowshipRequestAccepted($friendship));
             }
 
             return $saved;
@@ -226,7 +226,7 @@ trait HasFellowships
             ])->save();
 
             if ($saved) {
-                $this->dispatchFriendshipEvent(new FriendRequestDenied($friendship));
+                $this->dispatchFriendshipEvent(new FellowshipRequestDenied($friendship));
             }
 
             return $saved;
@@ -264,7 +264,7 @@ trait HasFellowships
             ])->save();
 
             if ($saved) {
-                $this->dispatchFriendshipEvent(new FriendRequestCanceled($friendship));
+                $this->dispatchFriendshipEvent(new FellowshipRequestCanceled($friendship));
             }
 
             return $saved;
@@ -275,14 +275,14 @@ trait HasFellowships
      * Block a user, preventing any future friend requests or interactions.
      *
      * @param  Model  $user  The user to block.
-     * @return Friendship Returns the updated or created friendship model with 'blocked' status.
+     * @return Fellowship Returns the updated or created friendship model with 'blocked' status.
      */
-    public function blockUser(Model $user): Friendship
+    public function blockUser(Model $user): Fellowship
     {
         $this->guardAgainstSelfFriendship($user);
 
         // If there is an existing friendship, update its status to 'blocked'. Otherwise, create a new friendship with 'blocked' status.
-        return DB::transaction(function () use ($user): Friendship {
+        return DB::transaction(function () use ($user): Fellowship {
             $existingFriendship = $this->friendshipBetween($user)
                 ->lockForUpdate()
                 ->first();
@@ -391,7 +391,7 @@ trait HasFellowships
             $deleted = (bool) $friendship->delete();
 
             if ($deleted) {
-                $this->dispatchFriendshipEvent(new FriendshipRemoved($friendship));
+                $this->dispatchFriendshipEvent(new FellowshipRemoved($friendship));
             }
 
             return $deleted;
@@ -487,9 +487,9 @@ trait HasFellowships
      * Get the friendship record with another user.
      *
      * @param  Model  $user  The other user in the friendship.
-     * @return Friendship|null Returns the friendship model or null.
+     * @return Fellowship|null Returns the friendship model or null.
      */
-    public function friendshipWith(Model $user): ?Friendship
+    public function friendshipWith(Model $user): ?Fellowship
     {
         $this->guardAgainstSelfFriendship($user);
 
@@ -779,10 +779,10 @@ trait HasFellowships
     /**
      * Check if a friendship request is expired.
      *
-     * @param  Friendship  $friendship  The friendship model to check.
+     * @param  Fellowship  $friendship  The friendship model to check.
      * @return bool Returns true if the friendship request is expired, false otherwise.
      */
-    protected function friendshipIsExpired(Friendship $friendship): bool
+    protected function friendshipIsExpired(Fellowship $friendship): bool
     {
         return $friendship->expires_at instanceof Carbon
             && $friendship->expires_at->isPast();
@@ -791,12 +791,12 @@ trait HasFellowships
     /**
      * Check if a friendship is in the resend cooldown window.
      *
-     * @param  Friendship  $friendship  The friendship model to check.
+     * @param  Fellowship  $friendship  The friendship model to check.
      * @return bool Returns true if another friend request cannot be sent yet, false otherwise.
      */
-    protected function friendshipIsInCooldown(Friendship $friendship): bool
+    protected function friendshipIsInCooldown(Fellowship $friendship): bool
     {
-        $days = config('friendships.request_cooldown_days');
+        $days = config('fellowship.request_cooldown_days');
 
         // If the configuration value is null or zero, cooldowns are disabled.
         if ($days === null || (int) $days <= 0) {
@@ -824,7 +824,7 @@ trait HasFellowships
      */
     protected function friendshipModel(): string
     {
-        return config('friendships.models.friendship', Friendship::class);
+        return config('fellowship.models.fellowship', Fellowship::class);
     }
 
     /**
@@ -834,7 +834,7 @@ trait HasFellowships
      */
     protected function friendRequestExpiresAt(): ?Carbon
     {
-        $days = config('friendships.expires_after_days');
+        $days = config('fellowship.expires_after_days');
 
         // If the configuration value is null, return null to indicate that friend requests do not expire.
         if ($days === null) {
@@ -854,7 +854,7 @@ trait HasFellowships
     protected function dispatchFriendshipEvent(object $event): void
     {
         // If event dispatching is disabled in the configuration, do not dispatch the event.
-        if (! config('friendships.dispatch_events', true)) {
+        if (! config('fellowship.dispatch_events', true)) {
             return;
         }
 

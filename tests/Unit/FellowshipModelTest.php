@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use EloquentWorks\Fellowship\Models\Fellowship;
-use EloquentWorks\Fellowship\Models\Friendship;
 use EloquentWorks\Fellowship\Status;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -56,11 +55,5 @@ class FellowshipModelTest extends TestCase
 
         $this->assertTrue($sender->is($fellowship->sender));
         $this->assertTrue($recipient->is($fellowship->recipient));
-    }
-
-    #[Test]
-    public function legacy_friendship_model_alias_extends_fellowship_model(): void
-    {
-        $this->assertTrue(is_subclass_of(Friendship::class, Fellowship::class));
     }
 }

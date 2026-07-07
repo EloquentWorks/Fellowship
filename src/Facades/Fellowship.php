@@ -22,6 +22,7 @@ class Fellowship
      * Register the fellowship routes.
      *
      * @param  array  $options  Optional configuration options for the routes.
+     * @return void Returns nothing.
      */
     public function routes(array $options = []): void
     {

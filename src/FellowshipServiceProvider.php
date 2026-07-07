@@ -4,6 +4,7 @@ namespace EloquentWorks\Fellowship;
 
 use EloquentWorks\Fellowship\Console\Commands\ExpireFellowshipRequestsCommand;
 use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
+use EloquentWorks\Fellowship\Facades\Fellowship as FellowshipManager;
 use Illuminate\Support\ServiceProvider;
 
 class FellowshipServiceProvider extends ServiceProvider
@@ -18,8 +19,12 @@ class FellowshipServiceProvider extends ServiceProvider
         // Merge the package's configuration file with the application's configuration
         $this->mergeConfigFrom(__DIR__.'/../config/fellowship.php', 'fellowship');
 
-        // Register the Fellowship class as a singleton in the service container
-        $this->app->singleton('fellowship', fn ($app): Fellowship => new Fellowship($app['router']));
+        // Register the Fellowship Facade class as a singleton in the service container
+        $this->app->singleton('fellowship', function ($app): FellowshipManager {
+            return new FellowshipManager($app['router']);
+        });
+
+        // Register the Fellowship class as an alias for the 'fellowship' singleton in the service container
         $this->app->alias('fellowship', Fellowship::class);
     }
 

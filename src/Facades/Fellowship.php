@@ -1,6 +1,6 @@
 <?php
 
-namespace EloquentWorks\Fellowship;
+namespace EloquentWorks\Fellowship\Facades;
 
 use EloquentWorks\Fellowship\Http\Controllers\FellowshipController;
 use Illuminate\Routing\Router;

@@ -25,7 +25,7 @@ class FellowshipServiceProvider extends ServiceProvider
         });
 
         // Register the Fellowship class as an alias for the 'fellowship' singleton in the service container
-        $this->app->alias('fellowship', Fellowship::class);
+        $this->app->alias('fellowship', FellowshipManager::class);
     }
 
     /**

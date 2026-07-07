@@ -3,6 +3,7 @@
 namespace EloquentWorks\Fellowship;
 
 // use EloquentWorks\Fellowship\Console\Commands\InstallFellowshipCommand;
+use EloquentWorks\Fellowship\Console\Commands\ExpireFellowshipRequestsCommand;
 use Illuminate\Support\ServiceProvider;
 
 class FellowshipServiceProvider extends ServiceProvider

@@ -3,7 +3,7 @@
 namespace EloquentWorks\Fellowship\Console\Commands;
 
 use EloquentWorks\Fellowship\Events\FriendRequestExpired;
-use EloquentWorks\Fellowship\Models\Friendship;
+use EloquentWorks\Fellowship\Models\Fellowship;
 use EloquentWorks\Fellowship\Status;
 use Illuminate\Console\Command;
 
@@ -27,7 +27,7 @@ class ExpireFellowshipRequestsCommand extends Command
     {
         $count = 0;
 
-        $friendshipModel = config('friendships.models.friendship', Friendship::class);
+        $friendshipModel = config('friendships.models.friendship', Fellowship::class);
 
         // Get the chunk size from the command option.
         $chunkSize = max(1, (int) $this->option('chunk'));
@@ -38,10 +38,10 @@ class ExpireFellowshipRequestsCommand extends Command
             ->whereNotNull('expires_at')
             ->where('expires_at', '<=', now())
             ->orderBy('id')
-            ->chunkById($chunkSize, function ($friendships) use (&$count): void {
-                // Update the status of each expired friendship to EXPIRED and clear the accepted_at timestamp.
-                foreach ($friendships as $friendship) {
-                    $friendship->forceFill([
+            ->chunkById($chunkSize, function ($fellowships) use (&$count): void {
+                // Update the status of each expired fellowship to EXPIRED and clear the accepted_at timestamp.
+                foreach ($fellowships as $fellowship) {
+                    $fellowship->forceFill([
                         'status' => Status::EXPIRED,
                         'accepted_at' => null,
                     ])->save();
@@ -49,7 +49,7 @@ class ExpireFellowshipRequestsCommand extends Command
                     $count++;
 
                     if (config('friendships.dispatch_events', true)) {
-                        event(new FriendRequestExpired($friendship));
+                        event(new FriendRequestExpired($fellowship));
                     }
                 }
             });

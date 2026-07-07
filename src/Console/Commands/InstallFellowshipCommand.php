@@ -6,12 +6,12 @@ use Illuminate\Console\Command;
 
 class InstallFellowshipCommand extends Command
 {
-    /** @var string $signature The name and signature of the console command. */
+    /** @var string The name and signature of the console command. */
     protected $signature = 'fellowship:install
         {--force : Overwrite any existing published files}
         {--routes : Publish a copyable Fellowship route snippet}';
 
-    /** @var string $description The description of the command. */
+    /** @var string The description of the command. */
     protected $description = 'Install the Fellowship package by publishing its config, migrations, and optional route snippet.';
 
     /**

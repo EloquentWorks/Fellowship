@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use EloquentWorks\Fellowship\Models\Fellowship;
 use EloquentWorks\Fellowship\Status;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Facades\DB;
 use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

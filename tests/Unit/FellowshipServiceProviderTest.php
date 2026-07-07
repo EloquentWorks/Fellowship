@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use EloquentWorks\Fellowship\Facades\Fellowship as FellowshipFacade;
 use EloquentWorks\Fellowship\Fellowship;
 use EloquentWorks\Fellowship\FellowshipServiceProvider;
+use EloquentWorks\Fellowship\FriendshipsServiceProvider;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -37,7 +38,7 @@ class FellowshipServiceProviderTest extends TestCase
     public function backwards_compatible_provider_alias_extends_the_main_provider(): void
     {
         $this->assertTrue(is_subclass_of(
-            \EloquentWorks\Fellowship\FriendshipsServiceProvider::class,
+            FriendshipsServiceProvider::class,
             FellowshipServiceProvider::class,
         ));
     }

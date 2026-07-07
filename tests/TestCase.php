@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use EloquentWorks\Fellowship\Facades\Fellowship;
 use EloquentWorks\Fellowship\FellowshipServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageAliases($app): array
     {
         return [
-            'Fellowship' => \EloquentWorks\Fellowship\Facades\Fellowship::class,
+            'Fellowship' => Fellowship::class,
         ];
     }
 

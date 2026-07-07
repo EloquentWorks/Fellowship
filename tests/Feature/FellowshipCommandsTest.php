@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use EloquentWorks\Fellowship\Events\FellowshipRequestExpired;
 use EloquentWorks\Fellowship\Models\Fellowship;
 use EloquentWorks\Fellowship\Status;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

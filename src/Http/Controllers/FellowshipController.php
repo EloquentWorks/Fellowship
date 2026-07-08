@@ -135,12 +135,15 @@ class FellowshipController extends Controller
      */
     protected function actor(Request $request): Model
     {
+        // Retrieve the authenticated user from the request.
         $actor = $request->user();
 
+        // Ensure that the authenticated user is an instance of the Eloquent Model class.
         if (! $actor instanceof Model) {
             throw new LogicException('The authenticated user must be an Eloquent model.');
         }
 
+        // Check if the authenticated user model implements all required friendship methods.
         foreach ($this->requiredFriendshipMethods() as $method) {
             if (! method_exists($actor, $method)) {
                 throw new LogicException('The authenticated user model must use the HasFriendships trait.');

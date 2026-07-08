@@ -50,9 +50,9 @@ class InstallFellowshipCommand extends Command
         // Inform the user that the installation process is complete and provide instructions for adding routes.
         $this->newLine();
         $this->components->info('Add this to routes/web.php when you want the web routes:');
-        $this->line('use EloquentWorks\\Fellowship\\Facades\\Fellowship;');
+        $this->line('use Illuminate\Support\Facades\Route;');
         $this->newLine();
-        $this->line('Fellowship::routes();');
+        $this->line('Route::fellowship();');
         $this->newLine();
 
         // Inform the user that the installation was successful.

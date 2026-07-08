@@ -16,14 +16,18 @@ class Fellowship extends Model
         'recipient_id',
         'pair_key',
         'status',
+        'muted_at',
         'accepted_at',
         'expires_at',
+        'is_favorite',
     ];
 
     /** @var array<string, string> The attributes that should be cast. */
     protected $casts = [
         'accepted_at' => 'datetime',
         'expires_at' => 'datetime',
+        'muted_at' => 'datetime',
+        'is_favorite' => 'boolean',
     ];
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use EloquentWorks\Fellowship\Http\Controllers\FellowshipController;
 use EloquentWorks\Fellowship\Models\Fellowship;
 
 return [
@@ -14,10 +15,15 @@ return [
     | You may replace these with your own custom models if you need to extend
     | the default package behavior.
     |
+    | The user model used when resolving route parameters and model
+    | relationships. Leave this as null to fall back to Laravel's
+    | configured auth user model.
+    |
     */
 
     'models' => [
         'fellowship' => Fellowship::class,
+        'user' => null,
     ],
 
     /*
@@ -43,9 +49,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Fellowship does not load web routes automatically. Register them inside
-    | your application's routes/web.php file with: Fellowship::routes();
+    | your application's routes/web.php file with:
+    |
+    | Route::fellowship();
     |
     | You may publish a copyable route snippet with:
+    |
     | php artisan vendor:publish --tag=fellowship-routes
     |
     */
@@ -54,6 +63,7 @@ return [
         'prefix' => 'fellowship',
         'middleware' => ['web', 'auth'],
         'name' => 'fellowship.',
+        'controller' => FellowshipController::class,
     ],
 
     /*
@@ -85,10 +95,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Friendship Events
+    | Fellowship Events
     |--------------------------------------------------------------------------
     |
-    | This controls whether the package dispatches friendship lifecycle events.
+    | This controls whether the package dispatches fellowship lifecycle events.
     |
     | Events are useful for notifications, activity feeds, logging, and other
     | application-specific side effects.

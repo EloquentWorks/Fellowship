@@ -2,8 +2,7 @@
 
 namespace Tests\Unit;
 
-use EloquentWorks\Fellowship\Facades\Fellowship as FellowshipFacade;
-use EloquentWorks\Fellowship\Fellowship;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -11,11 +10,9 @@ use Tests\TestCase;
 class FellowshipServiceProviderTest extends TestCase
 {
     #[Test]
-    public function it_registers_the_fellowship_singleton_and_facade(): void
+    public function it_registers_the_fellowship_route_macro(): void
     {
-        $this->assertTrue($this->app->bound('fellowship'));
-        $this->assertInstanceOf(Fellowship::class, $this->app->make('fellowship'));
-        $this->assertInstanceOf(Fellowship::class, FellowshipFacade::getFacadeRoot());
+        $this->assertTrue(Router::hasMacro('fellowship'));
     }
 
     #[Test]

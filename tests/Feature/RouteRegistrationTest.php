@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use EloquentWorks\Fellowship\Facades\Fellowship;
 use EloquentWorks\Fellowship\Http\Controllers\FellowshipController;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
@@ -11,9 +10,9 @@ use Tests\TestCase;
 class RouteRegistrationTest extends TestCase
 {
     #[Test]
-    public function facade_registers_default_fellowship_routes(): void
+    public function route_macro_registers_default_fellowship_routes(): void
     {
-        Fellowship::routes();
+        Route::fellowship(['middleware' => ['web', 'auth']]);
 
         $this->assertRoute('fellowship.requests.store', 'POST', 'fellowship/{user}/request');
         $this->assertRoute('fellowship.requests.accept', 'POST', 'fellowship/{user}/accept');
@@ -25,9 +24,9 @@ class RouteRegistrationTest extends TestCase
     }
 
     #[Test]
-    public function facade_accepts_custom_route_options(): void
+    public function route_macro_accepts_custom_route_options(): void
     {
-        Fellowship::routes([
+        Route::fellowship([
             'prefix' => 'connections',
             'name' => 'connections.',
             'middleware' => ['web'],
@@ -42,16 +41,18 @@ class RouteRegistrationTest extends TestCase
     }
 
     #[Test]
-    public function facade_accepts_a_custom_controller(): void
+    public function route_macro_accepts_a_custom_controller(): void
     {
-        Fellowship::routes([
+        Route::fellowship([
             'controller' => CustomFellowshipController::class,
             'middleware' => ['web'],
         ]);
 
         $route = Route::getRoutes()->getByName('fellowship.requests.store');
 
-        $this->assertSame(CustomFellowshipController::class.'@send', $route->getActionName());
+        $this->assertNotNull($route);
+        $this->assertSame(CustomFellowshipController::class, $route->getControllerClass());
+        $this->assertSame('send', $route->getActionMethod());
     }
 
     private function assertRoute(string $name, string $method, string $uri): void
@@ -71,7 +72,8 @@ class RouteRegistrationTest extends TestCase
         $this->assertNotNull($route, "Route [{$name}] was not registered.");
         $this->assertContains($method, $route->methods());
         $this->assertSame($uri, $route->uri());
-        $this->assertSame(FellowshipController::class.'@'.$actions[$name], $route->getActionName());
+        $this->assertSame(FellowshipController::class, $route->getControllerClass());
+        $this->assertSame($actions[$name], $route->getActionMethod());
     }
 }
 

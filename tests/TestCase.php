@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use EloquentWorks\Fellowship\Facades\Fellowship;
 use EloquentWorks\Fellowship\FellowshipServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +11,7 @@ use Tests\Support\User;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    // Register the package service provider
     protected function getPackageProviders($app): array
     {
         return [
@@ -19,15 +19,11 @@ abstract class TestCase extends OrchestraTestCase
         ];
     }
 
-    protected function getPackageAliases($app): array
-    {
-        return [
-            'Fellowship' => Fellowship::class,
-        ];
-    }
-
+    // Set up the environment for testing
     protected function getEnvironmentSetUp($app): void
     {
+        $app['config']->set('app.key', 'base64:'.base64_encode(str_repeat('a', 32)));
+
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
@@ -48,6 +44,7 @@ abstract class TestCase extends OrchestraTestCase
 
         $app['config']->set('fellowship.tables.users', 'users');
         $app['config']->set('fellowship.tables.friendships', 'friendships');
+        $app['config']->set('fellowship.models.user', User::class);
         $app['config']->set('fellowship.expires_after_days', 30);
         $app['config']->set('fellowship.request_cooldown_days', 7);
         $app['config']->set('fellowship.dispatch_events', true);

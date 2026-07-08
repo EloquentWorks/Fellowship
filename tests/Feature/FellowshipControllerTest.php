@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use EloquentWorks\Fellowship\Facades\Fellowship;
 use EloquentWorks\Fellowship\Status;
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -13,7 +13,7 @@ class FellowshipControllerTest extends TestCase
     {
         parent::setUp();
 
-        Fellowship::routes([
+        Route::fellowship([
             'middleware' => ['web', 'auth'],
         ]);
     }

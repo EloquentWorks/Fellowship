@@ -48,10 +48,7 @@
         "laravel": {
             "providers": [
                 "EloquentWorks\\Fellowship\\FellowshipServiceProvider"
-            ],
-            "aliases": {
-                "Fellowship": "EloquentWorks\\Fellowship\\Facades\\Fellowship"
-            }
+            ]
         }
     },
     "minimum-stability": "stable",

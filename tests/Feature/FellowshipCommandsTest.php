@@ -16,8 +16,8 @@ class FellowshipCommandsTest extends TestCase
     {
         $this->artisan('fellowship:install')
             ->expectsOutputToContain('Installing Fellowship')
-            ->expectsOutputToContain('use EloquentWorks\\Fellowship\\Facades\\Fellowship;')
-            ->expectsOutputToContain('Fellowship::routes();')
+            ->expectsOutputToContain('use Illuminate\\Support\\Facades\\Route;')
+            ->expectsOutputToContain('Route::fellowship();')
             ->assertExitCode(0);
     }
 

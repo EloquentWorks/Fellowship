@@ -1,7 +1,4 @@
 [![tests](https://github.com/EloquentWorks/Fellowship/actions/workflows/tests.yml/badge.svg)](https://github.com/EloquentWorks/Fellowship/actions/workflows/tests.yml)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/user-pixel-error/laravel-friendships.svg)](https://packagist.org/packages/user-pixel-error/laravel-friendships)
-[![Total Downloads](https://img.shields.io/packagist/dt/user-pixel-error/laravel-friendships.svg)](https://packagist.org/packages/user-pixel-error/laravel-friendships)
-[![PHP Version](https://img.shields.io/packagist/php-v/user-pixel-error/laravel-friendships.svg)](https://packagist.org/packages/user-pixel-error/laravel-friendships)
 
 # Fellowship
 

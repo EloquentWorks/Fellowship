@@ -28,11 +28,13 @@ $user->isFriendsWith($otherUser);
 - Install and cleanup Artisan commands
 - Configurable model and table names
 
-## Requirements
+## Supported Versions
 
-- PHP 8.2+
-- Laravel 10, 11, or 12
-- A user model that extends Eloquent
+| Package Version | PHP | Laravel / Illuminate |
+| --- | --- | --- |
+| Current | `^8.2` | `^12.0 \|\| ^13.0` |
+
+> Laravel 12 supports PHP 8.2+. Laravel 13 requires PHP 8.3+. Composer will automatically resolve compatible versions based on your project.
 
 ## Installation
 

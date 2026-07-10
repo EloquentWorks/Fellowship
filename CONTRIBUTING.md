@@ -1,15 +1,69 @@
 # Contributing
 
-First of all, **thank you** for contributing!
+Thanks for wanting to contribute to this Eloquent Works package.
 
-Here are a few rules to follow in order to ease code reviews and merging:
+## How to Contribute
 
-- follow [PSR-1](http://www.php-fig.org/psr/1/) and [PSR-2](http://www.php-fig.org/psr/2/)
-- run the test suite
-- write (or update) unit tests when applicable
-- write documentation for new features
-- use [commit messages that make sense](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
+You can help by:
 
-One may ask you to [squash your commits](http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html) too. This is used to "clean" your pull request before merging it (we don't want commits such as `fix tests`, `fix 2`, `fix 3`, etc.).
+- Reporting bugs
+- Suggesting features
+- Improving documentation
+- Adding tests
+- Submitting pull requests
 
-When creating your pull request on GitHub, please write a description which gives the context and/or explains why you are creating it.
+## Setup
+
+Clone the repository and install dependencies:
+
+```bash
+composer install
+```
+
+Run the tests:
+
+```bash
+composer test
+```
+
+Run code formatting:
+
+```bash
+composer format
+```
+
+Run static analysis:
+
+```bash
+composer analyse
+```
+
+## Pull Requests
+
+Before opening a pull request, please make sure:
+
+- Your change has one clear purpose
+- Tests pass
+- Code is formatted with Laravel Pint
+- Documentation is updated if needed
+
+## Bug Reports
+
+When reporting a bug, include:
+
+- Package version
+- PHP version
+- Laravel version
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+
+## Code Style
+
+This package follows Laravel-style code conventions and uses Laravel Pint.
+
+## Security
+
+Please do not open public issues for security problems. Report security concerns privately.
+
+Thank you for helping improve this package.

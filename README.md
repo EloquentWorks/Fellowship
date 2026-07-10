@@ -14,20 +14,6 @@ $otherUser->acceptFriendRequestFrom($user);
 $user->isFriendsWith($otherUser);
 ```
 
-## Features
-
-- Send, accept, deny, cancel, and expire friend requests
-- Remove accepted friends
-- Block and unblock users
-- Incoming and outgoing request collections
-- Friends and blocked-user collections
-- Mutual friends and mutual friend counts
-- Request expiration and resend cooldowns
-- Lifecycle events for notifications, logs, and activity feeds
-- Optional web routes with `Route::fellowship()`
-- Install and cleanup Artisan commands
-- Configurable model and table names
-
 ## Supported Versions
 
 | Package Version | PHP | Laravel / Illuminate |
@@ -61,6 +47,20 @@ Run your migrations:
 ```bash
 php artisan migrate
 ```
+
+## Features
+
+- Send, accept, deny, cancel, and expire friend requests
+- Remove accepted friends
+- Block and unblock users
+- Incoming and outgoing request collections
+- Friends and blocked-user collections
+- Mutual friends and mutual friend counts
+- Request expiration and resend cooldowns
+- Lifecycle events for notifications, logs, and activity feeds
+- Optional web routes with `Route::fellowship()`
+- Install and cleanup Artisan commands
+- Configurable model and table names
 
 ## Add the trait to your user model
 

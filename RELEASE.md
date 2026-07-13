@@ -1,6 +1,6 @@
 # Release Process
 
-This document describes the release workflow for Laravel Persona.
+This document describes the release workflow for Laravel Fellowship.
 
 ## Before releasing
 

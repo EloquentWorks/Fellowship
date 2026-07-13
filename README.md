@@ -27,7 +27,7 @@ $user->isFriendsWith($otherUser);
 Install the package through Composer:
 
 ```bash
-composer require eloquentworks/fellowship
+composer require eloquent-works/fellowship
 ```
 
 Publish the config and migrations:

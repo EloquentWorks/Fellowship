@@ -51,17 +51,20 @@
             ]
         }
     },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
     "scripts": {
         "format": "pint",
         "format:test": "pint --test",
-        "analyse": "phpstan analyse",
+        "analyse": "phpstan analyse --memory-limit=1G",
         "test": "phpunit",
-        "ci": [
+        "quality": [
             "@format:test",
             "@analyse",
             "@test"
         ]
-    }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

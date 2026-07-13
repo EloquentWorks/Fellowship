@@ -1,10 +1,10 @@
 [![tests](https://github.com/EloquentWorks/Fellowship/actions/workflows/tests.yml/badge.svg)](https://github.com/EloquentWorks/Fellowship/actions/workflows/tests.yml)
 
-# Fellowship
+# Laravel Fellowship
 
 Elegant friendship and social connection tools for Laravel applications.
 
-Fellowship gives your Eloquent user model a clean API for friend requests, accepted friendships, blocks, mutual friends, request expiration, cooldowns, web routes, events, and Artisan commands.
+Laravel Fellowship gives your Eloquent user model a clean API for friend requests, accepted friendships, blocks, mutual friends, request expiration, cooldowns, web routes, events, and Artisan commands.
 
 ```php
 $user->sendFriendRequestTo($otherUser);

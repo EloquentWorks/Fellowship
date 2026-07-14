@@ -18,7 +18,7 @@ class RouteRegistrationTest extends TestCase
         $this->assertRoute('fellowship.requests.accept', 'POST', 'fellowship/{user}/accept');
         $this->assertRoute('fellowship.requests.deny', 'POST', 'fellowship/{user}/deny');
         $this->assertRoute('fellowship.requests.cancel', 'DELETE', 'fellowship/{user}/cancel');
-        $this->assertRoute('fellowship.friends.remove', 'DELETE', 'fellowship/{user}/remove');
+        $this->assertRoute('fellowship.blocks.remove', 'DELETE', 'fellowship/{user}/remove');
         $this->assertRoute('fellowship.blocks.store', 'POST', 'fellowship/{user}/block');
         $this->assertRoute('fellowship.blocks.destroy', 'DELETE', 'fellowship/{user}/unblock');
     }
@@ -62,7 +62,7 @@ class RouteRegistrationTest extends TestCase
             'fellowship.requests.accept' => 'accept',
             'fellowship.requests.deny' => 'deny',
             'fellowship.requests.cancel' => 'cancel',
-            'fellowship.friends.remove' => 'remove',
+            'fellowship.blocks.remove' => 'remove',
             'fellowship.blocks.store' => 'block',
             'fellowship.blocks.destroy' => 'unblock',
         ];

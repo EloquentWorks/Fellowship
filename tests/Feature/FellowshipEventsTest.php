@@ -24,7 +24,7 @@ class FellowshipEventsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
         Event::assertDispatched(FellowshipRequestSent::class, fn ($event): bool => $event->fellowship->sender->is($sender)
             && $event->fellowship->recipient->is($recipient));
@@ -38,8 +38,8 @@ class FellowshipEventsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $recipient->acceptFriendRequestFrom($sender);
+        $sender->sendFellowshipRequestTo($recipient);
+        $recipient->acceptFellowshipRequestFrom($sender);
 
         Event::assertDispatched(FellowshipRequestAccepted::class);
     }
@@ -52,8 +52,8 @@ class FellowshipEventsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $recipient->denyFriendRequestFrom($sender);
+        $sender->sendFellowshipRequestTo($recipient);
+        $recipient->denyFellowshipRequestFrom($sender);
 
         Event::assertDispatched(FellowshipRequestDenied::class);
     }
@@ -66,8 +66,8 @@ class FellowshipEventsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $sender->cancelFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
+        $sender->cancelFellowshipRequestTo($recipient);
 
         Event::assertDispatched(FellowshipRequestCanceled::class);
     }
@@ -95,9 +95,9 @@ class FellowshipEventsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $recipient->acceptFriendRequestFrom($sender);
-        $sender->removeFriend($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
+        $recipient->acceptFellowshipRequestFrom($sender);
+        $sender->removeFellowship($recipient);
 
         Event::assertDispatched(FellowshipRemoved::class);
     }
@@ -110,11 +110,11 @@ class FellowshipEventsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient)->forceFill([
+        $sender->sendFellowshipRequestTo($recipient)->forceFill([
             'expires_at' => now()->subMinute(),
         ])->save();
 
-        $recipient->acceptFriendRequestFrom($sender);
+        $recipient->acceptFellowshipRequestFrom($sender);
 
         Event::assertDispatched(FellowshipRequestExpired::class);
     }
@@ -128,7 +128,7 @@ class FellowshipEventsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
         Event::assertNotDispatched(FellowshipRequestSent::class);
     }

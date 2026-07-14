@@ -30,7 +30,7 @@ class FellowshipControllerTest extends TestCase
             ->assertRedirect('/people')
             ->assertSessionHas('fellowship.status', 'request_sent');
 
-        $this->assertSame(Status::PENDING, $sender->friendshipStatusWith($recipient));
+        $this->assertSame(Status::PENDING, $sender->fellowshipStatusWith($recipient));
     }
 
     #[Test]
@@ -48,7 +48,7 @@ class FellowshipControllerTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
         $this->actingAs($recipient)
             ->from('/requests')
@@ -56,7 +56,7 @@ class FellowshipControllerTest extends TestCase
             ->assertRedirect('/requests')
             ->assertSessionHas('fellowship.status', 'request_accepted');
 
-        $this->assertTrue($recipient->isFriendsWith($sender));
+        $this->assertTrue($recipient->fellowshipStatusWith($sender));
     }
 
     #[Test]
@@ -65,7 +65,7 @@ class FellowshipControllerTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
         $this->actingAs($recipient)
             ->from('/requests')
@@ -73,7 +73,7 @@ class FellowshipControllerTest extends TestCase
             ->assertRedirect('/requests')
             ->assertSessionHas('fellowship.status', 'request_denied');
 
-        $this->assertSame(Status::DENIED, $recipient->friendshipStatusWith($sender));
+        $this->assertSame(Status::DENIED, $recipient->fellowshipStatusWith($sender));
     }
 
     #[Test]
@@ -82,7 +82,7 @@ class FellowshipControllerTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
         $this->actingAs($sender)
             ->from('/requests')
@@ -90,25 +90,25 @@ class FellowshipControllerTest extends TestCase
             ->assertRedirect('/requests')
             ->assertSessionHas('fellowship.status', 'request_canceled');
 
-        $this->assertSame(Status::CANCELED, $sender->friendshipStatusWith($recipient));
+        $this->assertSame(Status::CANCELED, $sender->fellowshipStatusWith($recipient));
     }
 
     #[Test]
-    public function user_can_remove_a_friend_through_the_web_route(): void
+    public function user_can_remove_a_fellowship_through_the_web_route(): void
     {
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $recipient->acceptFriendRequestFrom($sender);
+        $sender->sendFellowshipRequestTo($recipient);
+        $recipient->acceptFellowshipRequestFrom($sender);
 
         $this->actingAs($sender)
             ->from('/friends')
-            ->delete(route('fellowship.friends.remove', $recipient))
+            ->delete(route('fellowship.blocks.remove', $recipient))
             ->assertRedirect('/friends')
             ->assertSessionHas('fellowship.status', 'friend_removed');
 
-        $this->assertFalse($sender->isFriendsWith($recipient));
+        $this->assertFalse($sender->fellowshipStatusWith($recipient));
     }
 
     #[Test]

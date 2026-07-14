@@ -94,30 +94,30 @@ class FellowshipServiceProvider extends ServiceProvider
             $prefix = trim((string) $prefix, '/');
             $name = Str::finish((string) $name, '.');
 
-            // Define the route for sending friend requests.
+            // Define the route for sending fellowship requests.
             $router->post($prefix.'/{user}/request', [$controller, 'send'])
                 ->middleware($middleware)
                 ->name($name.'requests.store');
 
-            // Define routes for accepting, denying, canceling, and removing friend requests, as well as blocking and unblocking users.
+            // Define routes for accepting, denying, canceling, and removing fellowship requests, as well as blocking and unblocking users.
             $router->post($prefix.'/{user}/accept', [$controller, 'accept'])
                 ->middleware($middleware)
                 ->name($name.'requests.accept');
 
-            // Define the route for denying friend requests.
+            // Define the route for denying fellowship requests.
             $router->post($prefix.'/{user}/deny', [$controller, 'deny'])
                 ->middleware($middleware)
                 ->name($name.'requests.deny');
 
-            // Define the route for canceling friend requests.
+            // Define the route for canceling fellowship requests.
             $router->delete($prefix.'/{user}/cancel', [$controller, 'cancel'])
                 ->middleware($middleware)
                 ->name($name.'requests.cancel');
 
-            // Define the route for removing friends.
+            // Define the route for removing fellowships.
             $router->delete($prefix.'/{user}/remove', [$controller, 'remove'])
                 ->middleware($middleware)
-                ->name($name.'friends.remove');
+                ->name($name.'blocks.remove');
 
             // Define the route for blocking users.
             $router->post($prefix.'/{user}/block', [$controller, 'block'])

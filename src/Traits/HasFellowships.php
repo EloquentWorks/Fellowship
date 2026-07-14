@@ -64,131 +64,133 @@ trait HasFellowships
 
         $user = new $userModel;
 
-        // Get the IDs of users who have accepted friendships with this user, both sent and received.
-        $sentFriendIds = $this->sentFriendships()
+        // Get the IDs of users who have accepted fellowships with this user, both sent and received.
+        $sentFellowshipIds = $this->sentFellowships()
             ->where('status', Status::ACCEPTED)
             ->pluck('recipient_id');
-        $receivedFriendIds = $this->receivedFriendships()
+        $receivedFellowshipIds = $this->receivedFellowships()
             ->where('status', Status::ACCEPTED)
             ->pluck('sender_id');
 
-        // Merge the sent and received friend IDs, remove duplicates, and retrieve the corresponding user models.
+        // Merge the sent and received fellowship IDs, remove duplicates, and retrieve the corresponding user models.
         return $userModel::query()
-            ->whereIn($user->getKeyName(), $sentFriendIds->merge($receivedFriendIds)->unique())
+            ->whereIn($user->getKeyName(), $sentFellowshipIds->merge($receivedFellowshipIds)->unique())
             ->get();
     }
 
     /**
-     * Send a friend request to another user.
+     * Send a fellowship request to another user.
      *
-     * @param  Model  $user  The user to whom the friend request is being sent.
-     * @return Fellowship Returns the created or updated friendship model.
+     * @param  Model  $user  The user to whom the fellowship request is being sent.
+     * @return Fellowship Returns the created or updated fellowship model.
      */
-    public function sendFriendRequestTo(Model $user): Fellowship
+    public function sendFellowshipRequestTo(Model $user): Fellowship
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Use a database transaction to ensure atomicity of the friend request operation.
+        // Use a database transaction to ensure atomicity of the fellowship request operation.
         return DB::transaction(function () use ($user): Fellowship {
-            $pairKey = $this->friendshipPairKey($user);
+            $pairKey = $this->fellowshipPairKey($user);
 
-            // Check if there is an existing friendship between the two users.
-            $existingFriendship = $this->friendshipBetween($user)
+            // Check if there is an existing fellowship between the two users.
+            $existingFellowship = $this->fellowshipBetween($user)
                 ->lockForUpdate()
                 ->first();
 
-            // Handle different cases based on the existing friendship status.
-            if ($existingFriendship) {
-                if ($existingFriendship->status === Status::ACCEPTED) {
+            // Handle different cases based on the existing fellowship status.
+            if ($existingFellowship) {
+                if ($existingFellowship->status === Status::ACCEPTED) {
                     throw new LogicException('You are already friends with this user.');
                 }
 
-                if ($existingFriendship->status === Status::PENDING && ! $this->friendshipIsExpired($existingFriendship)) {
+                if ($existingFellowship->status === Status::PENDING && ! $this->fellowshipIsExpired($existingFellowship)) {
                     throw new LogicException('A friend request already exists between these users.');
                 }
 
-                if ($existingFriendship->status === Status::BLOCKED) {
+                if ($existingFellowship->status === Status::BLOCKED) {
                     throw new LogicException('A friend request cannot be sent between these users.');
                 }
 
-                if ($this->friendshipIsInCooldown($existingFriendship)) {
+                if ($this->fellowshipIsInCooldown($existingFellowship)) {
                     throw new LogicException('You must wait before sending another friend request to this user.');
                 }
 
-                // Update the existing friendship to 'pending' status and reset the accepted_at timestamp.
-                $existingFriendship->forceFill([
+                // Update the existing fellowship to 'pending' status and reset the accepted_at timestamp.
+                $existingFellowship->forceFill([
                     'sender_id' => $this->getKey(),
                     'recipient_id' => $user->getKey(),
                     'pair_key' => $pairKey,
                     'status' => Status::PENDING,
                     'accepted_at' => null,
-                    'expires_at' => $this->friendRequestExpiresAt(),
+                    'expires_at' => $this->fellowshipRequestExpiresAt(),
                 ])->save();
 
-                $this->dispatchFriendshipEvent(new FellowshipRequestSent($existingFriendship));
+                $this->dispatchFellowshipEvent(new FellowshipRequestSent($existingFellowship));
 
-                // Return the updated friendship model with 'pending' status.
-                return $existingFriendship;
+                // Return the updated fellowship model with 'pending' status.
+                return $existingFellowship;
             }
 
-            // If no existing friendship is found, create a new friendship with 'pending' status.
-            $friendship = $this->sentFriendships()->create([
+            // If no existing fellowship is found, create a new fellowship with 'pending' status.
+            $fellowship = $this->sentFellowships()->create([
                 'recipient_id' => $user->getKey(),
                 'pair_key' => $pairKey,
                 'status' => Status::PENDING,
-                'expires_at' => $this->friendRequestExpiresAt(),
+                'expires_at' => $this->fellowshipRequestExpiresAt(),
             ]);
 
-            $this->dispatchFriendshipEvent(new FellowshipRequestSent($friendship));
+            // Dispatch an event indicating that a fellowship request has been sent.
+            $this->dispatchFellowshipEvent(new FellowshipRequestSent($fellowship));
 
-            return $friendship;
+            // Return the newly created fellowship model with 'pending' status.
+            return $fellowship;
         });
     }
 
     /**
-     * Accept a friend request from another user.
+     * Accept a fellowship request from another user.
      *
-     * @param  Model  $user  The user who sent the friend request.
-     * @return bool Returns true if the friend request was accepted, false otherwise.
+     * @param  Model  $user  The user who sent the fellowship request.
+     * @return bool Returns true if the fellowship request was accepted, false otherwise.
      */
-    public function acceptFriendRequestFrom(Model $user): bool
+    public function acceptFellowshipRequestFrom(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Find the pending friendship request from the specified user.
+        // Find the pending fellowship request from the specified user.
         return DB::transaction(function () use ($user): bool {
-            $friendship = $this->receivedFriendships()
+            $fellowship = $this->receivedFellowships()
                 ->where('sender_id', $user->getKey())
                 ->where('status', Status::PENDING)
                 ->lockForUpdate()
                 ->first();
 
-            // If no pending friendship request is found, return false.
-            if (! $friendship) {
+            // If no pending fellowship request is found, return false.
+            if (! $fellowship) {
                 return false;
             }
 
-            // If the friendship request has an expiration date and it has already passed, mark it as expired and return false.
-            if ($this->friendshipIsExpired($friendship)) {
-                $friendship->forceFill([
+            // If the fellowship request has an expiration date and it has already passed, mark it as expired and return false.
+            if ($this->fellowshipIsExpired($fellowship)) {
+                $fellowship->forceFill([
                     'status' => Status::EXPIRED,
                     'accepted_at' => null,
                 ])->save();
 
-                $this->dispatchFriendshipEvent(new FellowshipRequestExpired($friendship));
+                $this->dispatchFellowshipEvent(new FellowshipRequestExpired($fellowship));
 
                 return false;
             }
 
-            // Update the friendship status to 'accepted', set the accepted_at timestamp, and clear the expires_at timestamp.
-            $saved = $friendship->forceFill([
+            // Update the fellowship status to 'accepted', set the accepted_at timestamp, and clear the expires_at timestamp.
+            $saved = $fellowship->forceFill([
                 'status' => Status::ACCEPTED,
                 'accepted_at' => now(),
                 'expires_at' => null,
             ])->save();
 
             if ($saved) {
-                $this->dispatchFriendshipEvent(new FellowshipRequestAccepted($friendship));
+                $this->dispatchFellowshipEvent(new FellowshipRequestAccepted($fellowship));
             }
 
             return $saved;
@@ -196,37 +198,37 @@ trait HasFellowships
     }
 
     /**
-     * Deny a friend request from another user.
+     * Deny a fellowship request from another user.
      *
-     * @param  Model  $user  The user who sent the friend request.
-     * @return bool Returns true if the friend request was successfully denied, false otherwise.
+     * @param  Model  $user  The user who sent the fellowship request.
+     * @return bool Returns true if the fellowship request was successfully denied, false otherwise.
      */
-    public function denyFriendRequestFrom(Model $user): bool
+    public function denyFellowshipRequestFrom(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
         return DB::transaction(function () use ($user): bool {
-            // Find the pending friendship request from the specified user.
-            $friendship = $this->receivedFriendships()
+            // Find the pending fellowship request from the specified user.
+            $fellowship = $this->receivedFellowships()
                 ->where('sender_id', $user->getKey())
                 ->where('status', Status::PENDING)
                 ->lockForUpdate()
                 ->first();
 
-            // If no pending friendship request is found, return false.
-            if (! $friendship) {
+            // If no pending fellowship request is found, return false.
+            if (! $fellowship) {
                 return false;
             }
 
-            // Update the friendship status to 'denied' and reset the accepted_at timestamp for the pending request.
-            $saved = $friendship->forceFill([
+            // Update the fellowship status to 'denied' and reset the accepted_at timestamp for the pending request.
+            $saved = $fellowship->forceFill([
                 'status' => Status::DENIED,
                 'accepted_at' => null,
                 'expires_at' => null,
             ])->save();
 
             if ($saved) {
-                $this->dispatchFriendshipEvent(new FellowshipRequestDenied($friendship));
+                $this->dispatchFellowshipEvent(new FellowshipRequestDenied($fellowship));
             }
 
             return $saved;
@@ -234,37 +236,37 @@ trait HasFellowships
     }
 
     /**
-     * Cancel a pending friend request sent to another user.
+     * Cancel a pending fellowship request sent to another user.
      *
-     * @param  Model  $user  The user to whom the friend request was sent.
-     * @return bool Returns true if the friend request was successfully canceled, false otherwise.
+     * @param  Model  $user  The user to whom the fellowship request was sent.
+     * @return bool Returns true if the fellowship request was successfully canceled, false otherwise.
      */
-    public function cancelFriendRequestTo(Model $user): bool
+    public function cancelFellowshipRequestTo(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
         return DB::transaction(function () use ($user): bool {
-            // Find the pending friendship request sent to the specified user.
-            $friendship = $this->sentFriendships()
+            // Find the pending fellowship request sent to the specified user.
+            $fellowship = $this->sentFellowships()
                 ->where('recipient_id', $user->getKey())
                 ->where('status', Status::PENDING)
                 ->lockForUpdate()
                 ->first();
 
-            // If no pending friendship request is found, return false.
-            if (! $friendship) {
+            // If no pending fellowship request is found, return false.
+            if (! $fellowship) {
                 return false;
             }
 
-            // Cancel the pending friend request by updating its status to 'canceled' and resetting the accepted_at timestamp.
-            $saved = $friendship->forceFill([
+            // Cancel the pending fellowship request by updating its status to 'canceled' and resetting the accepted_at timestamp.
+            $saved = $fellowship->forceFill([
                 'status' => Status::CANCELED,
                 'accepted_at' => null,
                 'expires_at' => null,
             ])->save();
 
             if ($saved) {
-                $this->dispatchFriendshipEvent(new FellowshipRequestCanceled($friendship));
+                $this->dispatchFellowshipEvent(new FellowshipRequestCanceled($fellowship));
             }
 
             return $saved;
@@ -279,43 +281,43 @@ trait HasFellowships
      */
     public function blockUser(Model $user): Fellowship
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // If there is an existing friendship, update its status to 'blocked'. Otherwise, create a new friendship with 'blocked' status.
+        // If there is an existing fellowship, update its status to 'blocked'. Otherwise, create a new fellowship with 'blocked' status.
         return DB::transaction(function () use ($user): Fellowship {
-            $existingFriendship = $this->friendshipBetween($user)
+            $existingFellowship = $this->fellowshipBetween($user)
                 ->lockForUpdate()
                 ->first();
 
-            // If an existing friendship is found, update its status to 'blocked' and reset the accepted_at timestamp.
-            if ($existingFriendship) {
-                $existingFriendship->forceFill([
+            // If an existing fellowship is found, update its status to 'blocked' and reset the accepted_at timestamp.
+            if ($existingFellowship) {
+                $existingFellowship->forceFill([
                     'sender_id' => $this->getKey(),
                     'recipient_id' => $user->getKey(),
-                    'pair_key' => $this->friendshipPairKey($user),
+                    'pair_key' => $this->fellowshipPairKey($user),
                     'status' => Status::BLOCKED,
                     'accepted_at' => null,
                     'expires_at' => null,
                 ])->save();
 
-                $this->dispatchFriendshipEvent(new UserBlocked($existingFriendship));
+                $this->dispatchFellowshipEvent(new UserBlocked($existingFellowship));
 
-                // Return the updated friendship model with 'blocked' status.
-                return $existingFriendship;
+                // Return the updated fellowship model with 'blocked' status.
+                return $existingFellowship;
             }
 
-            // If no existing friendship is found, create a new friendship with 'blocked' status.
-            $friendship = $this->sentFriendships()->create([
+            // If no existing fellowship is found, create a new fellowship with 'blocked' status.
+            $fellowship = $this->sentFellowships()->create([
                 'recipient_id' => $user->getKey(),
-                'pair_key' => $this->friendshipPairKey($user),
+                'pair_key' => $this->fellowshipPairKey($user),
                 'status' => Status::BLOCKED,
                 'accepted_at' => null,
                 'expires_at' => null,
             ]);
 
-            $this->dispatchFriendshipEvent(new UserBlocked($friendship));
+            $this->dispatchFellowshipEvent(new UserBlocked($fellowship));
 
-            return $friendship;
+            return $fellowship;
         });
     }
 
@@ -327,34 +329,34 @@ trait HasFellowships
      */
     public function unblockUser(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
         // Use a database transaction to ensure atomicity of the unblock operation.
         return DB::transaction(function () use ($user): bool {
-            $friendship = $this->friendshipBetween($user)
+            $fellowship = $this->fellowshipBetween($user)
                 ->lockForUpdate()
                 ->first();
 
-            // If no friendship record is found, return false.
-            if (! $friendship) {
+            // If no fellowship record is found, return false.
+            if (! $fellowship) {
                 return false;
             }
 
-            // If the friendship status is not 'blocked', return false.
-            if ($friendship->status !== Status::BLOCKED) {
+            // If the fellowship status is not 'blocked', return false.
+            if ($fellowship->status !== Status::BLOCKED) {
                 return false;
             }
 
             // Ensure that the current user is the sender of the block before allowing unblocking.
-            if ((string) $friendship->sender_id !== (string) $this->getKey()) {
+            if ((string) $fellowship->sender_id !== (string) $this->getKey()) {
                 return false;
             }
 
-            // Delete the friendship record to unblock the user and return true if successful.
-            $deleted = (bool) $friendship->delete();
+            // Delete the fellowship record to unblock the user and return true if successful.
+            $deleted = (bool) $fellowship->delete();
 
             if ($deleted) {
-                $this->dispatchFriendshipEvent(new UserUnblocked($friendship));
+                $this->dispatchFellowshipEvent(new UserUnblocked($fellowship));
             }
 
             return $deleted;
@@ -369,29 +371,29 @@ trait HasFellowships
      */
     public function removeFriend(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
         // Use a database transaction to ensure atomicity of the remove friend operation.
         return DB::transaction(function () use ($user): bool {
-            $friendship = $this->friendshipBetween($user)
+            $fellowship = $this->fellowshipBetween($user)
                 ->lockForUpdate()
                 ->first();
 
-            // If no friendship record is found, return false.
-            if (! $friendship) {
+            // If no fellowship record is found, return false.
+            if (! $fellowship) {
                 return false;
             }
 
-            // If the friendship status is not 'accepted', return false.
-            if ($friendship->status !== Status::ACCEPTED) {
+            // If the fellowship status is not 'accepted', return false.
+            if ($fellowship->status !== Status::ACCEPTED) {
                 return false;
             }
 
-            // Delete the friendship record to remove the friend and return true if successful.
-            $deleted = (bool) $friendship->delete();
+            // Delete the fellowship record to remove the friend and return true if successful.
+            $deleted = (bool) $fellowship->delete();
 
             if ($deleted) {
-                $this->dispatchFriendshipEvent(new FellowshipRemoved($friendship));
+                $this->dispatchFellowshipEvent(new FellowshipRemoved($fellowship));
             }
 
             return $deleted;
@@ -406,10 +408,10 @@ trait HasFellowships
      */
     public function isFriendsWith(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Check if there is an accepted friendship between this user and the specified user.
-        return $this->friendshipBetween($user)
+        // Check if there is an accepted fellowship between this user and the specified user.
+        return $this->fellowshipBetween($user)
             ->where('status', Status::ACCEPTED)
             ->exists();
     }
@@ -422,10 +424,10 @@ trait HasFellowships
      */
     public function hasBlocked(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Check if there is a blocked friendship where this user created the block.
-        return $this->friendshipBetween($user)
+        // Check if there is a blocked fellowship where this user created the block.
+        return $this->fellowshipBetween($user)
             ->where('status', Status::BLOCKED)
             ->where('sender_id', $this->getKey())
             ->exists();
@@ -439,27 +441,27 @@ trait HasFellowships
      */
     public function isBlockedBy(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Check if there is a blocked friendship where the other user created the block.
-        return $this->friendshipBetween($user)
+        // Check if there is a blocked fellowship where the other user created the block.
+        return $this->fellowshipBetween($user)
             ->where('status', Status::BLOCKED)
             ->where('sender_id', $user->getKey())
             ->exists();
     }
 
     /**
-     * Check if there is a pending friend request between this user and another user, considering expiration.
+     * Check if there is a pending fellowship request between this user and another user, considering expiration.
      *
-     * @param  Model  $user  The other user to check for a pending friend request.
-     * @return bool Returns true if there is a pending friend request, false otherwise.
+     * @param  Model  $user  The other user to check for a pending fellowship request.
+     * @return bool Returns true if there is a pending fellowship request, false otherwise.
      */
-    public function hasPendingFriendRequestWith(Model $user): bool
+    public function hasPendingFellowshipRequestWith(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Check if there is a pending friendship between this user and the specified user, considering expiration.
-        return $this->friendshipBetween($user)
+        // Check if there is a pending fellowship between this user and the specified user, considering expiration.
+        return $this->fellowshipBetween($user)
             ->where('status', Status::PENDING)
             ->where(function (Builder $query): void {
                 $query->whereNull('expires_at')
@@ -469,43 +471,43 @@ trait HasFellowships
     }
 
     /**
-     * Get the friendship status with another user.
+     * Get the fellowship status with another user.
      *
      * @param  Model  $user  The other user to check.
-     * @return string|null Returns the friendship status or null if no friendship exists.
+     * @return string|null Returns the fellowship status or null if no fellowship exists.
      */
-    public function friendshipStatusWith(Model $user): ?string
+    public function fellowshipStatusWith(Model $user): ?string
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Retrieve the friendship status between this user and the specified user.
-        return $this->friendshipBetween($user)
+        // Retrieve the fellowship status between this user and the specified user.
+        return $this->fellowshipBetween($user)
             ->value('status');
     }
 
     /**
-     * Get the friendship record with another user.
+     * Get the fellowship record with another user.
      *
-     * @param  Model  $user  The other user in the friendship.
-     * @return Fellowship|null Returns the friendship model or null.
+     * @param  Model  $user  The other user in the fellowship.
+     * @return Fellowship|null Returns the fellowship model or null.
      */
-    public function friendshipWith(Model $user): ?Fellowship
+    public function fellowshipWith(Model $user): ?Fellowship
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Retrieve the friendship record between this user and the specified user.
-        return $this->friendshipBetween($user)->first();
+        // Retrieve the fellowship record between this user and the specified user.
+        return $this->fellowshipBetween($user)->first();
     }
 
     /**
-     * Get incoming pending friend requests.
+     * Get incoming pending fellowship requests.
      *
-     * @return Collection Returns a collection of incoming pending friendship models.
+     * @return Collection Returns a collection of incoming pending fellowship models.
      */
-    public function incomingFriendRequests(): Collection
+    public function incomingFellowshipRequests(): Collection
     {
-        // Retrieve pending, non-expired friend requests received by this user.
-        return $this->receivedFriendships()
+        // Retrieve pending, non-expired fellowship requests received by this user.
+        return $this->receivedFellowships()
             ->where('status', Status::PENDING)
             ->where(function (Builder $query): void {
                 $query->whereNull('expires_at')
@@ -516,14 +518,14 @@ trait HasFellowships
     }
 
     /**
-     * Get outgoing pending friend requests.
+     * Get outgoing pending fellowship requests.
      *
-     * @return Collection Returns a collection of outgoing pending friendship models.
+     * @return Collection Returns a collection of outgoing pending fellowship models.
      */
-    public function outgoingFriendRequests(): Collection
+    public function outgoingFellowshipRequests(): Collection
     {
-        // Retrieve pending, non-expired friend requests sent by this user.
-        return $this->sentFriendships()
+        // Retrieve pending, non-expired fellowship requests sent by this user.
+        return $this->sentFellowships()
             ->where('status', Status::PENDING)
             ->where(function (Builder $query): void {
                 $query->whereNull('expires_at')
@@ -540,12 +542,14 @@ trait HasFellowships
      */
     public function blockedUsers(): Collection
     {
+        // Retrieve the user model class from the configuration.
         $userModel = config('auth.providers.users.model');
 
+        // Create a new instance of the user model to access its key name.
         $user = new $userModel;
 
         // Get the IDs of users blocked by this user.
-        $blockedUserIds = $this->sentFriendships()
+        $blockedUserIds = $this->sentFellowships()
             ->where('status', Status::BLOCKED)
             ->pluck('recipient_id');
 
@@ -562,12 +566,14 @@ trait HasFellowships
      */
     public function blockedByUsers(): Collection
     {
+        // Retrieve the user model class from the configuration.
         $userModel = config('auth.providers.users.model');
 
+        // Create a new instance of the user model to access its key name.
         $user = new $userModel;
 
         // Get the IDs of users that blocked this user.
-        $blockedByUserIds = $this->receivedFriendships()
+        $blockedByUserIds = $this->receivedFellowships()
             ->where('status', Status::BLOCKED)
             ->pluck('sender_id');
 
@@ -581,20 +587,20 @@ trait HasFellowships
      * Get mutual friends shared with another user.
      *
      * @param  Model  $user  The other user to compare friends with.
-     * @return Collection Returns a collection of mutual friend models.
+     * @return Collection Returns a collection of mutual fellowship models.
      */
-    public function mutualFriendsWith(Model $user): Collection
+    public function mutualFellowshipsWith(Model $user): Collection
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Get the IDs of this user's friends and the other user's friends.
-        $myFriendIds = $this->friends()->pluck($this->getKeyName());
+        // Get the IDs of this user's fellowships and the other user's fellowships.
+        $myFellowshipIds = $this->fellowships()->pluck($this->getKeyName());
 
-        // Get the IDs of the other user's friends.
-        $theirFriendIds = $user->friends()->pluck($user->getKeyName());
+        // Get the IDs of the other user's fellowships.
+        $theirFellowshipIds = $user->fellowships()->pluck($user->getKeyName());
 
-        // Find the intersection of both users' friend IDs to get mutual friends.
-        $mutualFriendIds = $myFriendIds->intersect($theirFriendIds)->values();
+        // Find the intersection of both users' fellowship IDs to get mutual fellowships.
+        $mutualFellowshipIds = $myFellowshipIds->intersect($theirFellowshipIds)->values();
 
         // Retrieve the user model class from the configuration.
         $userModel = config('auth.providers.users.model');
@@ -602,152 +608,152 @@ trait HasFellowships
         // Create a new instance of the user model to access its key name.
         $model = new $userModel;
 
-        // Return a collection of mutual friend models based on the mutual friend IDs.
+        // Return a collection of mutual fellowship models based on the mutual fellowship IDs.
         return $userModel::query()
-            ->whereIn($model->getKeyName(), $mutualFriendIds)
+            ->whereIn($model->getKeyName(), $mutualFellowshipIds)
             ->get();
     }
 
     /**
-     * Count mutual friends shared with another user.
+     * Count mutual fellowships shared with another user.
      *
-     * @param  Model  $user  The other user to compare friends with.
-     * @return int Returns the mutual friend count.
+     * @param  Model  $user  The other user to compare fellowships with.
+     * @return int Returns the mutual fellowship count.
      */
-    public function mutualFriendsCountWith(Model $user): int
+    public function mutualFellowshipsCountWith(Model $user): int
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Count the mutual friends shared between this user and the specified user.
-        return $this->mutualFriendsWith($user)->count();
+        // Count the mutual fellowships shared between this user and the specified user.
+        return $this->mutualFellowshipsWith($user)->count();
     }
 
     /**
-     * Count all accepted friends for this user.
+     * Count all accepted fellowships for this user.
      *
-     * @return int Returns the total friend count.
+     * @return int Returns the total fellowship count.
      */
-    public function friendsCount(): int
+    public function fellowshipsCount(): int
     {
-        // Count the number of accepted friendships where this user was the sender.
-        $sentCount = $this->sentFriendships()
+        // Count the number of accepted fellowships where this user was the sender.
+        $sentCount = $this->sentFellowships()
             ->where('status', Status::ACCEPTED)
             ->count();
 
-        // Count the number of accepted friendships where this user was the recipient.
-        $receivedCount = $this->receivedFriendships()
+        // Count the number of accepted fellowships where this user was the recipient.
+        $receivedCount = $this->receivedFellowships()
             ->where('status', Status::ACCEPTED)
             ->count();
 
-        // Return the total count of accepted friends by summing sent and received counts.
+        // Return the total count of accepted fellowships by summing sent and received counts.
         return $sentCount + $receivedCount;
     }
 
     /**
-     * Check if this user can send a friend request to another user.
+     * Check if this user can send a fellowship request to another user.
      *
      * @param  Model  $user  The user to check.
-     * @return bool Returns true if a friend request can be sent.
+     * @return bool Returns true if a fellowship request can be sent.
      */
-    public function canSendFriendRequestTo(Model $user): bool
+    public function canSendFellowshipRequestTo(Model $user): bool
     {
-        $this->guardAgainstSelfFriendship($user);
+        $this->guardAgainstSelfFellowship($user);
 
-        // Check if there is an existing friendship between this user and the specified user.
-        $friendship = $this->friendshipBetween($user)->first();
+        // Check if there is an existing fellowship between this user and the specified user.
+        $fellowship = $this->fellowshipBetween($user)->first();
 
-        // If no friendship exists, the user can send a friend request.
-        if (! $friendship) {
+        // If no fellowship exists, the user can send a fellowship request.
+        if (! $fellowship) {
             return true;
         }
 
-        // If the friendship is pending and not expired, the user cannot send a friend request.
-        if ($friendship->status === Status::PENDING && ! $this->friendshipIsExpired($friendship)) {
+        // If the fellowship is pending and not expired, the user cannot send a fellowship request.
+        if ($fellowship->status === Status::PENDING && ! $this->fellowshipIsExpired($fellowship)) {
             return false;
         }
 
-        // If the friendship is already accepted, the user cannot send a friend request.
-        if ($friendship->status === Status::ACCEPTED) {
+        // If the fellowship is already accepted, the user cannot send a fellowship request.
+        if ($fellowship->status === Status::ACCEPTED) {
             return false;
         }
 
-        // If the friendship is blocked, the user cannot send a friend request.
-        if ($friendship->status === Status::BLOCKED) {
+        // If the fellowship is blocked, the user cannot send a fellowship request.
+        if ($fellowship->status === Status::BLOCKED) {
             return false;
         }
 
-        // If the friendship is in cooldown, the user cannot send a friend request yet.
-        if ($this->friendshipIsInCooldown($friendship)) {
+        // If the fellowship is in cooldown, the user cannot send a fellowship request yet.
+        if ($this->fellowshipIsInCooldown($fellowship)) {
             return false;
         }
 
-        // In all other cases (denied, canceled, expired outside cooldown), the user can send a friend request.
+        // In all other cases (denied, canceled, expired outside cooldown), the user can send a fellowship request.
         return true;
     }
 
     /**
-     * Get accepted friendships where this user was the sender.
+     * Get accepted fellowships where this user was the sender.
      *
-     * @return HasMany Returns the accepted sent friendships relationship.
+     * @return HasMany Returns the accepted sent fellowships relationship.
      */
-    public function acceptedSentFriendships(): HasMany
+    public function acceptedSentFellowships(): HasMany
     {
-        return $this->sentFriendships()
+        return $this->sentFellowships()
             ->where('status', Status::ACCEPTED);
     }
 
     /**
-     * Get accepted friendships where this user was the recipient.
+     * Get accepted fellowships where this user was the recipient.
      *
-     * @return HasMany Returns the accepted received friendships relationship.
+     * @return HasMany Returns the accepted received fellowships relationship.
      */
-    public function acceptedReceivedFriendships(): HasMany
+    public function acceptedReceivedFellowships(): HasMany
     {
-        return $this->receivedFriendships()
+        return $this->receivedFellowships()
             ->where('status', Status::ACCEPTED);
     }
 
     /**
-     * Get pending friendships where this user was the sender.
+     * Get pending fellowships where this user was the sender.
      *
-     * @return HasMany Returns the pending sent friendships relationship.
+     * @return HasMany Returns the pending sent fellowships relationship.
      */
-    public function pendingSentFriendships(): HasMany
+    public function pendingSentFellowships(): HasMany
     {
-        return $this->sentFriendships()
+        return $this->sentFellowships()
             ->where('status', Status::PENDING);
     }
 
     /**
-     * Get pending friendships where this user was the recipient.
+     * Get pending fellowships where this user was the recipient.
      *
-     * @return HasMany Returns the pending received friendships relationship.
+     * @return HasMany Returns the pending received fellowships relationship.
      */
-    public function pendingReceivedFriendships(): HasMany
+    public function pendingReceivedFellowships(): HasMany
     {
-        return $this->receivedFriendships()
+        return $this->receivedFellowships()
             ->where('status', Status::PENDING);
     }
 
     /**
-     * Build a query for the friendship between this model and another model.
+     * Build a query for the fellowship between this model and another model.
      *
-     * @param  Model  $user  The other user in the friendship.
-     * @return Builder Returns a query builder for the friendship.
+     * @param  Model  $user  The other user in the fellowship.
+     * @return Builder Returns a query builder for the fellowship.
      */
-    protected function friendshipBetween(Model $user): Builder
+    protected function fellowshipBetween(Model $user): Builder
     {
-        return $this->friendshipModel()::query()
-            ->where('pair_key', $this->friendshipPairKey($user));
+        return $this->fellowshipModel()::query()
+            ->where('pair_key', $this->fellowshipPairKey($user));
     }
 
     /**
-     * Generate a unique key for the friendship pair.
+     * Generate a unique key for the fellowship pair.
      *
-     * @param  Model  $user  The other user in the friendship.
-     * @return string Returns a unique key representing the friendship pair.
+     * @param  Model  $user  The other user in the fellowship.
+     * @return string Returns a unique key representing the fellowship pair.
      */
-    protected function friendshipPairKey(Model $user): string
+    protected function fellowshipPairKey(Model $user): string
     {
         $ids = [
             (string) $this->getKey(),
@@ -762,39 +768,39 @@ trait HasFellowships
     }
 
     /**
-     * Guard against sending a friend request to oneself.
+     * Guard against sending a fellowship request to oneself.
      *
      * @param  Model  $user  The user to check against.
      * @return void Returns nothing.
      *
-     * @throws LogicException Throws an exception if the user is trying to send a friend request to themselves.
+     * @throws LogicException Throws an exception if the user is trying to send a fellowship request to themselves.
      */
-    protected function guardAgainstSelfFriendship(Model $user): void
+    protected function guardAgainstSelfFellowship(Model $user): void
     {
         if ((string) $this->getKey() === (string) $user->getKey()) {
-            throw new LogicException('You cannot send a friend request to yourself.');
+            throw new LogicException('You cannot send a fellowship request to yourself.');
         }
     }
 
     /**
-     * Check if a friendship request is expired.
+     * Check if a fellowship request is expired.
      *
-     * @param  Fellowship  $friendship  The friendship model to check.
-     * @return bool Returns true if the friendship request is expired, false otherwise.
+     * @param  Fellowship  $fellowship  The fellowship model to check.
+     * @return bool Returns true if the fellowship request is expired, false otherwise.
      */
-    protected function friendshipIsExpired(Fellowship $friendship): bool
+    protected function fellowshipIsExpired(Fellowship $fellowship): bool
     {
-        return $friendship->expires_at instanceof Carbon
-            && $friendship->expires_at->isPast();
+        return $fellowship->expires_at instanceof Carbon
+            && $fellowship->expires_at->isPast();
     }
 
     /**
-     * Check if a friendship is in the resend cooldown window.
+     * Check if a fellowship is in the resend cooldown window.
      *
-     * @param  Fellowship  $friendship  The friendship model to check.
-     * @return bool Returns true if another friend request cannot be sent yet, false otherwise.
+     * @param  Fellowship  $fellowship  The fellowship model to check.
+     * @return bool Returns true if another fellowship request cannot be sent yet, false otherwise.
      */
-    protected function friendshipIsInCooldown(Fellowship $friendship): bool
+    protected function fellowshipIsInCooldown(Fellowship $fellowship): bool
     {
         $days = config('fellowship.request_cooldown_days');
 
@@ -804,39 +810,39 @@ trait HasFellowships
         }
 
         // Only denied, canceled, and expired requests should trigger the resend cooldown.
-        if (! in_array($friendship->status, [Status::DENIED, Status::CANCELED, Status::EXPIRED], true)) {
+        if (! in_array($fellowship->status, [Status::DENIED, Status::CANCELED, Status::EXPIRED], true)) {
             return false;
         }
 
         // If updated_at is not available as a date, do not apply a cooldown.
-        if (! $friendship->updated_at instanceof Carbon) {
+        if (! $fellowship->updated_at instanceof Carbon) {
             return false;
         }
 
-        // The friendship is in cooldown if it was updated within the configured cooldown window.
-        return $friendship->updated_at->gt(now()->subDays((int) $days));
+        // The fellowship is in cooldown if it was updated within the configured cooldown window.
+        return $fellowship->updated_at->gt(now()->subDays((int) $days));
     }
 
     /**
-     * Get the friendship model class name from the configuration.
+     * Get the fellowship model class name from the configuration.
      *
-     * @return string Returns the friendship model class name.
+     * @return string Returns the fellowship model class name.
      */
-    protected function friendshipModel(): string
+    protected function fellowshipModel(): string
     {
         return config('fellowship.models.fellowship', Fellowship::class);
     }
 
     /**
-     * Get the expiration date for friend requests based on the configuration.
+     * Get the expiration date for fellowship requests based on the configuration.
      *
-     * @return Carbon|null Returns the expiration date or null if friend requests do not expire.
+     * @return Carbon|null Returns the expiration date or null if fellowship requests do not expire.
      */
-    protected function friendRequestExpiresAt(): ?Carbon
+    protected function fellowshipRequestExpiresAt(): ?Carbon
     {
         $days = config('fellowship.expires_after_days');
 
-        // If the configuration value is null, return null to indicate that friend requests do not expire.
+        // If the configuration value is null, return null to indicate that fellowship requests do not expire.
         if ($days === null) {
             return null;
         }
@@ -846,19 +852,19 @@ trait HasFellowships
     }
 
     /**
-     * Dispatch a friendship event if package events are enabled.
+     * Dispatch a fellowship event if package events are enabled.
      *
      * @param  object  $event  The event instance to dispatch.
      * @return void Returns nothing.
      */
-    protected function dispatchFriendshipEvent(object $event): void
+    protected function dispatchFellowshipEvent(object $event): void
     {
         // If event dispatching is disabled in the configuration, do not dispatch the event.
         if (! config('fellowship.dispatch_events', true)) {
             return;
         }
 
-        // Dispatch the friendship event.
+        // Dispatch the fellowship event.
         event($event);
     }
 }

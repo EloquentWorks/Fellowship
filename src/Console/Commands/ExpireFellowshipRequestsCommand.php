@@ -27,7 +27,7 @@ class ExpireFellowshipRequestsCommand extends Command
     {
         $count = 0;
 
-        $fellowshipModel = config('fellowships.models.fellowship', Fellowship::class);
+        $fellowshipModel = config('fellowship.models.fellowship', Fellowship::class);
 
         // Get the chunk size from the command option.
         $chunkSize = max(1, (int) $this->option('chunk'));
@@ -48,7 +48,7 @@ class ExpireFellowshipRequestsCommand extends Command
 
                     $count++;
 
-                    if (config('fellowships.dispatch_events', true)) {
+                    if (config('fellowship.dispatch_events', true)) {
                         event(new FellowshipRequestExpired($fellowship));
                     }
                 }

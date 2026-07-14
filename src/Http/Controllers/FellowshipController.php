@@ -20,63 +20,63 @@ class FellowshipController extends Controller
      */
     public function send(Request $request, mixed $user): RedirectResponse
     {
-        // Send a friend request to the specified user by calling the sendFriendRequestTo method on the authenticated user.
-        $this->actor($request)->sendFriendRequestTo($this->resolveUser($user));
+        // Send a fellowship request to the specified user by calling the sendFellowshipRequestTo method on the authenticated user.
+        $this->actor($request)->sendFellowshipRequestTo($this->resolveUser($user));
 
         // Return a redirect response back to the previous page with a status message indicating that the request has been sent.
         return back()->with('fellowship.status', 'request_sent');
     }
 
     /**
-     * Accept a friend request from another user.
+     * Accept a fellowship request from another user.
      *
      * @param  Request  $request  The incoming HTTP request.
-     * @param  mixed  $user  The user to accept the friend request from (can be a user ID or an instance of the user model).
+     * @param  mixed  $user  The user to accept the fellowship request from (can be a user ID or an instance of the user model).
      * @return RedirectResponse Returns a redirect response back to the previous page with a status message.
      */
     public function accept(Request $request, mixed $user): RedirectResponse
     {
-        // Accept the friend request from the specified user by calling the acceptFriendRequestFrom method on the authenticated user.
-        $this->actor($request)->acceptFriendRequestFrom($this->resolveUser($user));
+        // Accept the fellowship request from the specified user by calling the acceptFellowshipRequestFrom method on the authenticated user.
+        $this->actor($request)->acceptFellowshipRequestFrom($this->resolveUser($user));
 
         // Return a redirect response back to the previous page with a status message indicating that the request has been accepted.
         return back()->with('fellowship.status', 'request_accepted');
     }
 
     /**
-     * Deny a received friend request.
+     * Deny a received fellowship request.
      *
      * @param  Request  $request  The incoming HTTP request.
-     * @param  mixed  $user  The user to deny the friend request from (can be a user ID or an instance of the user model).
+     * @param  mixed  $user  The user to deny the fellowship request from (can be a user ID or an instance of the user model).
      * @return RedirectResponse Returns a redirect response back to the previous page with a status message.
      */
     public function deny(Request $request, mixed $user): RedirectResponse
     {
-        // Deny the friend request from the specified user by calling the denyFriendRequestFrom method on the authenticated user.
-        $this->actor($request)->denyFriendRequestFrom($this->resolveUser($user));
+        // Deny the fellowship request from the specified user by calling the denyFellowshipRequestFrom method on the authenticated user.
+        $this->actor($request)->denyFellowshipRequestFrom($this->resolveUser($user));
 
         // Return a redirect response back to the previous page with a status message indicating that the request has been denied.
         return back()->with('fellowship.status', 'request_denied');
     }
 
     /**
-     * Cancel a sent friend request.
+     * Cancel a sent fellowship request.
      *
      * @param  Request  $request  The incoming HTTP request.
-     * @param  mixed  $user  The user to cancel the friend request to (can be a user ID or an instance of the user model).
+     * @param  mixed  $user  The user to cancel the fellowship request to (can be a user ID or an instance of the user model).
      * @return RedirectResponse Returns a redirect response back to the previous page with a status message.
      */
     public function cancel(Request $request, mixed $user): RedirectResponse
     {
-        // Cancel the sent friend request to the specified user by calling the cancelFriendRequestTo method on the authenticated user.
-        $this->actor($request)->cancelFriendRequestTo($this->resolveUser($user));
+        // Cancel the sent fellowship request to the specified user by calling the cancelFellowshipRequestTo method on the authenticated user.
+        $this->actor($request)->cancelFellowshipRequestTo($this->resolveUser($user));
 
         // Return a redirect response back to the previous page with a status message indicating that the request has been canceled.
         return back()->with('fellowship.status', 'request_canceled');
     }
 
     /**
-     * Remove a friend from the authenticated user's friends list.
+     * Remove a fellowship from the authenticated user's list.
      *
      * @param  Request  $request  The incoming HTTP request.
      * @param  mixed  $user  The user to remove (can be a user ID or an instance of the user model).
@@ -84,11 +84,11 @@ class FellowshipController extends Controller
      */
     public function remove(Request $request, mixed $user): RedirectResponse
     {
-        // Remove the specified user from the authenticated user's friends list by calling the removeFriend method.
-        $this->actor($request)->removeFriend($this->resolveUser($user));
+        // Remove the specified user from the authenticated user's fellowship list by calling the removeFellowship method.
+        $this->actor($request)->removeFellowship($this->resolveUser($user));
 
-        // Return a redirect response back to the previous page with a status message indicating that the friend has been removed.
-        return back()->with('fellowship.status', 'friend_removed');
+        // Return a redirect response back to the previous page with a status message indicating that the fellowship has been removed.
+        return back()->with('fellowship.status', 'fellowship_removed');
     }
 
     /**
@@ -127,9 +127,9 @@ class FellowshipController extends Controller
      * Get the authenticated model using the Fellowship trait methods.
      *
      * Laravel can only type the authenticated user as the base auth user/model, but
-     * this controller requires the consuming app's user model to use HasFriendships.
+     * this controller requires the consuming app's user model to use HasFellowships.
      * The runtime method checks keep the error message clear, while the PHPDoc
-     * intersection tells PHPStan that the friendship methods are available here.
+     * intersection tells PHPStan that the fellowship methods are available here.
      *
      * @return Model&FellowshipUser
      */
@@ -143,10 +143,12 @@ class FellowshipController extends Controller
             throw new LogicException('The authenticated user must be an Eloquent model.');
         }
 
-        // Check if the authenticated user model implements all required friendship methods.
-        foreach ($this->requiredFriendshipMethods() as $method) {
+        // Check if the authenticated user model implements all required fellowship methods.
+        foreach ($this->requiredFellowshipMethods() as $method) {
             if (! method_exists($actor, $method)) {
-                throw new LogicException('The authenticated user model must use the HasFriendships trait.');
+                throw new LogicException(
+                    'The authenticated user model must use the HasFellowships trait.'
+                );
             }
         }
 
@@ -182,18 +184,18 @@ class FellowshipController extends Controller
     }
 
     /**
-     * Get the list of required friendship methods that the authenticated user model must implement.
+     * Get the list of required fellowship methods that the authenticated user model must implement.
      *
-     * @return array Returns an array of method names that are required for the friendship functionality.
+     * @return array Returns an array of method names that are required for the fellowship functionality.
      */
-    protected function requiredFriendshipMethods(): array
+    protected function requiredFellowshipMethods(): array
     {
         return [
-            'sendFriendRequestTo',
-            'acceptFriendRequestFrom',
-            'denyFriendRequestFrom',
-            'cancelFriendRequestTo',
-            'removeFriend',
+            'sendFellowshipRequestTo',
+            'acceptFellowshipRequestFrom',
+            'denyFellowshipRequestFrom',
+            'cancelFellowshipRequestTo',
+            'removeFellowship',
             'blockUser',
             'unblockUser',
         ];

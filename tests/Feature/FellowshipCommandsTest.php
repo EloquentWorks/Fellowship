@@ -39,11 +39,11 @@ class FellowshipCommandsTest extends TestCase
         $recipient = createUser();
         $activeRecipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient)->forceFill([
+        $sender->sendFellowshipRequestTo($recipient)->forceFill([
             'expires_at' => now()->subHour(),
         ])->save();
 
-        $sender->sendFriendRequestTo($activeRecipient)->forceFill([
+        $sender->sendFellowshipRequestTo($activeRecipient)->forceFill([
             'expires_at' => now()->addHour(),
         ])->save();
 

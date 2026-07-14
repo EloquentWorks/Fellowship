@@ -18,16 +18,16 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $fellowship = $sender->sendFriendRequestTo($recipient);
+        $fellowship = $sender->sendFellowshipRequestTo($recipient);
 
         $this->assertInstanceOf(Fellowship::class, $fellowship);
-        $this->assertTrue($sender->hasPendingFriendRequestWith($recipient));
-        $this->assertTrue($recipient->hasPendingFriendRequestWith($sender));
-        $this->assertSame(Status::PENDING, $sender->friendshipStatusWith($recipient));
+        $this->assertTrue($sender->hasPendingFellowshipRequestWith($recipient));
+        $this->assertTrue($recipient->hasPendingFellowshipRequestWith($sender));
+        $this->assertSame(Status::PENDING, $sender->fellowshipStatusWith($recipient));
         $this->assertSame($sender->getKey().':'.$recipient->getKey(), $fellowship->pair_key);
         $this->assertTrue($fellowship->expires_at->isFuture());
-        $this->assertCount(1, $sender->outgoingFriendRequests());
-        $this->assertCount(1, $recipient->incomingFriendRequests());
+        $this->assertCount(1, $sender->outgoingFellowshipRequests());
+        $this->assertCount(1, $recipient->incomingFellowshipRequests());
     }
 
     #[Test]
@@ -36,30 +36,30 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('A friend request already exists between these users.');
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
     }
 
     #[Test]
-    public function recipient_can_accept_a_friend_request(): void
+    public function recipient_can_accept_a_fellowship_request(): void
     {
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
-        $this->assertTrue($recipient->acceptFriendRequestFrom($sender));
+        $this->assertTrue($recipient->acceptFellowshipRequestFrom($sender));
         $this->assertTrue($sender->isFriendsWith($recipient));
         $this->assertTrue($recipient->isFriendsWith($sender));
-        $this->assertSame(Status::ACCEPTED, $sender->friendshipStatusWith($recipient));
+        $this->assertSame(Status::ACCEPTED, $sender->fellowshipStatusWith($recipient));
         $this->assertSame(1, $sender->friendsCount());
         $this->assertSame(1, $recipient->friendsCount());
-        $this->assertTrue($recipient->friendshipWith($sender)->accepted_at->isToday());
-        $this->assertNull($recipient->friendshipWith($sender)->expires_at);
+        $this->assertTrue($recipient->fellowshipWith($sender)->accepted_at->isToday());
+        $this->assertNull($recipient->fellowshipWith($sender)->expires_at);
     }
 
     #[Test]
@@ -68,23 +68,23 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
-        $this->assertFalse($sender->acceptFriendRequestFrom($recipient));
+        $this->assertFalse($sender->acceptFellowshipRequestFrom($recipient));
         $this->assertFalse($sender->isFriendsWith($recipient));
     }
 
     #[Test]
-    public function recipient_can_deny_a_friend_request(): void
+    public function recipient_can_deny_a_fellowship_request(): void
     {
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
-        $this->assertTrue($recipient->denyFriendRequestFrom($sender));
-        $this->assertSame(Status::DENIED, $sender->friendshipStatusWith($recipient));
-        $this->assertCount(0, $recipient->incomingFriendRequests());
+        $this->assertTrue($recipient->denyFellowshipRequestFrom($sender));
+        $this->assertSame(Status::DENIED, $sender->fellowshipStatusWith($recipient));
+        $this->assertCount(0, $recipient->incomingFellowshipRequests());
     }
 
     #[Test]
@@ -93,11 +93,11 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
 
-        $this->assertTrue($sender->cancelFriendRequestTo($recipient));
-        $this->assertSame(Status::CANCELED, $sender->friendshipStatusWith($recipient));
-        $this->assertCount(0, $sender->outgoingFriendRequests());
+        $this->assertTrue($sender->cancelFellowshipRequestTo($recipient));
+        $this->assertSame(Status::CANCELED, $sender->fellowshipStatusWith($recipient));
+        $this->assertCount(0, $sender->outgoingFellowshipRequests());
     }
 
     #[Test]
@@ -108,10 +108,10 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $recipient->denyFriendRequestFrom($sender);
+        $sender->sendFellowshipRequestTo($recipient);
+        $recipient->denyFellowshipRequestFrom($sender);
 
-        $resent = $sender->sendFriendRequestTo($recipient);
+        $resent = $sender->sendFellowshipRequestTo($recipient);
 
         $this->assertSame(Status::PENDING, $resent->status);
         $this->assertSame($sender->getKey(), $resent->sender_id);
@@ -125,14 +125,14 @@ class HasFriendshipsTest extends TestCase
         $recipient = createUser();
 
         $sender->sendFriendRequestTo($recipient);
-        $recipient->denyFriendRequestFrom($sender);
+        $recipient->denyFellowshipRequestFrom($sender);
 
-        $this->assertFalse($sender->canSendFriendRequestTo($recipient));
+        $this->assertFalse($sender->canSendFellowshipRequestTo($recipient));
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You must wait before sending another friend request to this user.');
+        $this->expectExceptionMessage('You must wait before sending another fellowship request to this user.');
 
-        $sender->sendFriendRequestTo($recipient);
+        $sender->sendFellowshipRequestTo($recipient);
     }
 
     #[Test]
@@ -141,17 +141,17 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $recipient->denyFriendRequestFrom($sender);
+        $sender->sendFellowshipRequestTo($recipient);
+        $recipient->denyFellowshipRequestFrom($sender);
 
-        $fellowship = $sender->friendshipWith($recipient);
+        $fellowship = $sender->fellowshipWith($recipient);
 
-        DB::table('friendships')
+        DB::table('fellowships')
             ->where('id', $fellowship->getKey())
             ->update(['updated_at' => now()->subDays(8)]);
 
-        $this->assertTrue($sender->canSendFriendRequestTo($recipient));
-        $this->assertSame(Status::PENDING, $sender->sendFriendRequestTo($recipient)->status);
+        $this->assertTrue($sender->canSendFellowshipRequestTo($recipient));
+        $this->assertSame(Status::PENDING, $sender->sendFellowshipRequestTo($recipient)->status);
     }
 
     #[Test]
@@ -160,16 +160,16 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient);
-        $recipient->acceptFriendRequestFrom($sender);
+        $sender->sendFellowshipRequestTo($recipient);
+        $recipient->acceptFellowshipRequestFrom($sender);
 
-        $this->assertTrue($sender->removeFriend($recipient));
-        $this->assertFalse($sender->isFriendsWith($recipient));
-        $this->assertNull($sender->friendshipWith($recipient));
+        $this->assertTrue($sender->removeFellowship($recipient));
+        $this->assertFalse($sender->fellowshipStatusWith($recipient));
+        $this->assertNull($sender->fellowshipWith($recipient));
     }
 
     #[Test]
-    public function blocking_prevents_friend_requests_until_unblocked(): void
+    public function blocking_prevents_fellowship_requests_until_unblocked(): void
     {
         $blocker = createUser();
         $blocked = createUser();
@@ -180,10 +180,10 @@ class HasFriendshipsTest extends TestCase
         $this->assertTrue($blocker->hasBlocked($blocked));
         $this->assertTrue($blocked->isBlockedBy($blocker));
         $this->assertFalse($blocked->hasBlocked($blocker));
-        $this->assertFalse($blocker->canSendFriendRequestTo($blocked));
+        $this->assertFalse($blocker->canSendFellowshipRequestTo($blocked));
 
         $this->expectException(LogicException::class);
-        $blocked->sendFriendRequestTo($blocker);
+        $blocked->sendFellowshipRequestTo($blocker);
     }
 
     #[Test]
@@ -209,8 +209,8 @@ class HasFriendshipsTest extends TestCase
         $blocked = createUser();
         $blockedBy = createUser();
 
-        $user->sendFriendRequestTo($friend);
-        $friend->acceptFriendRequestFrom($user);
+        $user->sendFellowshipRequestTo($friend);
+        $friend->acceptFellowshipRequestFrom($user);
         $user->blockUser($blocked);
         $blockedBy->blockUser($user);
 
@@ -228,14 +228,14 @@ class HasFriendshipsTest extends TestCase
         $mutual = createUser();
         $notMutual = createUser();
 
-        $user->sendFriendRequestTo($mutual);
-        $mutual->acceptFriendRequestFrom($user);
+        $user->sendFellowshipRequestTo($mutual);
+        $mutual->acceptFellowshipRequestFrom($user);
 
-        $otherUser->sendFriendRequestTo($mutual);
-        $mutual->acceptFriendRequestFrom($otherUser);
+        $otherUser->sendFellowshipRequestTo($mutual);
+        $mutual->acceptFellowshipRequestFrom($otherUser);
 
-        $user->sendFriendRequestTo($notMutual);
-        $notMutual->acceptFriendRequestFrom($user);
+        $user->sendFellowshipRequestTo($notMutual);
+        $notMutual->acceptFellowshipRequestFrom($user);
 
         $this->assertSame(1, $user->mutualFriendsCountWith($otherUser));
         $this->assertTrue($user->mutualFriendsWith($otherUser)->first()->is($mutual));
@@ -247,36 +247,36 @@ class HasFriendshipsTest extends TestCase
         $sender = createUser();
         $recipient = createUser();
 
-        $sender->sendFriendRequestTo($recipient)->forceFill([
+        $sender->sendFellowshipRequestTo($recipient)->forceFill([
             'expires_at' => now()->subMinute(),
         ])->save();
 
-        $this->assertFalse($sender->hasPendingFriendRequestWith($recipient));
-        $this->assertFalse($recipient->acceptFriendRequestFrom($sender));
-        $this->assertSame(Status::EXPIRED, $sender->friendshipStatusWith($recipient));
+        $this->assertFalse($sender->hasPendingFellowshipRequestWith($recipient));
+        $this->assertFalse($recipient->acceptFellowshipRequestFrom($sender));
+        $this->assertSame(Status::EXPIRED, $sender->fellowshipStatusWith($recipient));
     }
 
     #[Test]
-    public function friend_requests_can_be_configured_to_never_expire(): void
+    public function fellowship_requests_can_be_configured_to_never_expire(): void
     {
         config()->set('fellowship.expires_after_days', null);
 
         $sender = createUser();
         $recipient = createUser();
 
-        $fellowship = $sender->sendFriendRequestTo($recipient);
+        $fellowship = $sender->sendFellowshipRequestTo($recipient);
 
         $this->assertNull($fellowship->expires_at);
     }
 
     #[Test]
-    public function self_friendship_actions_throw_a_logic_exception(): void
+    public function self_fellowship_actions_throw_a_logic_exception(): void
     {
         $user = createUser();
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You cannot send a friend request to yourself.');
+        $this->expectExceptionMessage('You cannot send a fellowship request to yourself.');
 
-        $user->sendFriendRequestTo($user);
+        $user->sendFellowshipRequestTo($user);
     }
 }
